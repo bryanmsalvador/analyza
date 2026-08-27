@@ -3,7 +3,7 @@ const crypto = require("crypto")
 const { Resend } = require("resend")
 const express   = require("express")
 const cors      = require("cors")
-const bcrypt    = require("bcrypt")
+const bcrypt    = require("bcryptjs")
 const jwt       = require("jsonwebtoken")
 const path      = require("path")
 const axios     = require("axios")
@@ -61,6 +61,14 @@ app.use((req, _res, next) => {
 })
 
 app.use(express.static(path.join(__dirname, "public")))
+
+// Explicit fallback route for root and main pages (Vercel serverless compatibility)
+app.get("/", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"))
+})
+app.get("/dashboard", (_req, res) => {
+  res.sendFile(path.join(__dirname, "public", "dashboard.html"))
+})
 
 const supabase     = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY)
 const genAI        = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
