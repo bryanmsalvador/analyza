@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analyza — Inteligência Financeira</title>
+  <meta name="description" content="Envie seu extrato bancário e deixe a IA organizar, categorizar e revelar padrões que você nunca viu.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpeg" href="logo-a.jpg">
+</head>
+<body>
+
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <img src="logo-full.png" class="logo-full-img" alt="Analyza">
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Como funciona</a>
+      <a href="#pricing">Planos</a>
+      <a href="#suporte">Suporte</a>
+    </nav>
+    <div class="header-actions">
+      <button id="loginBtn" class="btn-ghost">Entrar</button>
+      <button id="registerBtn" class="btn-primary">Começar grátis</button>
+    </div>
+    <!-- Mobile menu button -->
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- Mobile nav drawer -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="#features" class="mobile-nav-link">Como funciona</a>
+    <a href="#pricing" class="mobile-nav-link">Planos</a>
+    <a href="#suporte" class="mobile-nav-link">Suporte</a>
+    <div class="mobile-nav-actions">
+      <button id="mobileLoginBtn" class="btn-ghost" style="width:100%">Entrar</button>
+      <button id="mobileRegisterBtn" class="btn-primary" style="width:100%">Começar grátis</button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">
+    <span class="eyebrow-dot"></span>
+    IA Financeira de Nova Geração
+  </div>
+  <h1 class="hero-title">
+    <span id="heroLine1" class="hero-line1">Seu extrato</span>
+    <br>
+    <em id="heroLine2" class="hero-line2"></em><span class="hero-cursor" id="heroCursor">|</span>
+  </h1>
+  <p class="hero-sub anim-reveal" style="opacity:0">
+    Envie qualquer extrato bancário e deixe a Analyza organizar,<br class="br-desktop">
+    categorizar e revelar padrões que você nunca viu.
+  </p>
+  <div class="hero-cta anim-reveal" id="heroCta" style="opacity:0">
+    <!-- Este botão muda de comportamento via JS dependendo do estado do login -->
+    <button class="btn-primary btn-lg hero-btn-main" id="heroMainBtn">
+      Criar conta grátis →
+    </button>
+    <span class="hero-cta-note" id="heroNote">Sem cartão · Cancele quando quiser</span>
+  </div>
+
+
+  <div class="hero-preview hero-preview-dual anim-reveal" style="opacity:0">
+    <!-- Card 1: análise com barras -->
+    <div class="preview-card">
+      <div class="preview-header">
+        <span class="preview-dot green"></span>
+        <span class="preview-label">Análise de Março</span>
+        <span class="preview-score">Score 74</span>
+      </div>
+      <div class="preview-bars">
+        <div class="preview-bar-row">
+          <span>Alimentação</span>
+          <div class="bar-track"><div class="bar-fill" style="width:68%;--c:#f59e0b"></div></div>
+          <span>R$820</span>
+        </div>
+        <div class="preview-bar-row">
+          <span>Transporte</span>
+          <div class="bar-track"><div class="bar-fill" style="width:32%;--c:#3b82f6"></div></div>
+          <span>R$390</span>
+        </div>
+        <div class="preview-bar-row">
+          <span>Lazer</span>
+          <div class="bar-track"><div class="bar-fill" style="width:20%;--c:#a78bfa"></div></div>
+          <span>R$240</span>
+        </div>
+        <div class="preview-bar-row">
+          <span>Saúde</span>
+          <div class="bar-track"><div class="bar-fill" style="width:14%;--c:#34d399"></div></div>
+          <span>R$165</span>
+        </div>
+      </div>
+      <div class="preview-insight">💡 Você gastou 23% mais em alimentação que no mês anterior.</div>
+    </div>
+
+    <!-- Card 2: Business -->
+    <div class="preview-card preview-card-business">
+      <div class="preview-header">
+        <span class="preview-dot" style="background:#a78bfa"></span>
+        <span class="preview-label">Business — Evolução</span>
+        <span class="preview-score" style="background:rgba(167,139,250,.12);color:#a78bfa;border-color:rgba(167,139,250,.2)">★ Business</span>
+      </div>
+      <div class="preview-chart">
+        <div class="preview-chart-bars">
+          <div class="preview-chart-group">
+            <div class="preview-chart-bar-wrap">
+              <div class="preview-chart-bar" style="height:40%;background:#34d399"></div>
+              <div class="preview-chart-bar" style="height:60%;background:#f59e0b"></div>
+            </div>
+            <div class="preview-chart-label">Jan</div>
+          </div>
+          <div class="preview-chart-group">
+            <div class="preview-chart-bar-wrap">
+              <div class="preview-chart-bar" style="height:55%;background:#34d399"></div>
+              <div class="preview-chart-bar" style="height:45%;background:#f59e0b"></div>
+            </div>
+            <div class="preview-chart-label">Fev</div>
+          </div>
+          <div class="preview-chart-group">
+            <div class="preview-chart-bar-wrap">
+              <div class="preview-chart-bar" style="height:70%;background:#34d399"></div>
+              <div class="preview-chart-bar" style="height:55%;background:#f59e0b"></div>
+            </div>
+            <div class="preview-chart-label">Mar</div>
+          </div>
+          <div class="preview-chart-group">
+            <div class="preview-chart-bar-wrap">
+              <div class="preview-chart-bar" style="height:50%;background:#34d399"></div>
+              <div class="preview-chart-bar" style="height:70%;background:#f59e0b"></div>
+            </div>
+            <div class="preview-chart-label">Abr</div>
+          </div>
+          <div class="preview-chart-group">
+            <div class="preview-chart-bar-wrap">
+              <div class="preview-chart-bar" style="height:80%;background:#34d399"></div>
+              <div class="preview-chart-bar" style="height:50%;background:#f59e0b"></div>
+            </div>
+            <div class="preview-chart-label">Mai</div>
+          </div>
+        </div>
+        <div class="preview-chart-legend">
+          <span><i style="background:#34d399"></i>Entradas</span>
+          <span><i style="background:#f59e0b"></i>Saídas</span>
+        </div>
+      </div>
+      <div class="preview-streaming">
+        <div class="preview-streaming-title">📺 Assinaturas detectadas</div>
+        <div class="preview-streaming-list">
+          <div class="preview-streaming-item"><span>Netflix</span><span style="color:#a78bfa">R$55</span></div>
+          <div class="preview-streaming-item"><span>Spotify</span><span style="color:#a78bfa">R$22</span></div>
+          <div class="preview-streaming-item"><span>Amazon Prime</span><span style="color:#a78bfa">R$19</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOCIAL PROOF BAR -->
+<div class="social-proof-bar">
+  <div class="social-proof-inner">
+    <div class="social-proof-item">
+      <span class="sp-number">2.400+</span>
+      <span class="sp-label">extratos analisados</span>
+    </div>
+    <div class="sp-divider"></div>
+    <div class="social-proof-item">
+      <span class="sp-number">98%</span>
+      <span class="sp-label">de satisfação</span>
+    </div>
+    <div class="sp-divider"></div>
+    <div class="social-proof-item">
+      <span class="sp-number">R$1.2M+</span>
+      <span class="sp-label">em gastos identificados</span>
+    </div>
+    <div class="sp-divider"></div>
+    <div class="social-proof-item">
+      <span class="sp-number">< 30s</span>
+      <span class="sp-label">tempo de análise</span>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="section-label">Como funciona</div>
+  <h2 class="section-title">Três passos. Resultados reais.</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+      <div class="feature-step">01</div>
+      <h3>Envie seu extrato</h3>
+      <p>CSV, PDF ou texto simples. A Analyza entende qualquer formato bancário brasileiro — Nubank, Itaú, Bradesco e mais.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      </div>
+      <div class="feature-step">02</div>
+      <h3>IA analisa tudo</h3>
+      <p>Gemini para Free e Pro. Plano Business usa <strong style="color:var(--gold)">Gemini 2.5 Flash</strong> com prompt de consultoria avançado — diagnóstico completo, tendências e próximos passos.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="feature-step">03</div>
+      <h3>Tome decisões</h3>
+      <p>Receba insights acionáveis, alertas de gastos excessivos e um histórico completo das suas finanças.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- BUSINESS SHOWCASE -->
+<section class="business-showcase" id="business">
+  <div class="business-inner">
+    <div class="section-label" style="text-align:left">Plano Business</div>
+    <h2 class="section-title" style="text-align:left">Consultoria financeira com IA em <em style="color:#a78bfa;font-style:italic">nível profissional.</em></h2>
+    <p style="color:var(--text-dim);font-size:15px;max-width:720px;margin-bottom:48px;line-height:1.7">
+      No plano Business, o <strong style="color:var(--text)">Gemini 2.5 Flash</strong> opera com um prompt de consultoria avançado — analisando seu extrato com profundidade de nível profissional. Não é só uma análise. É um diagnóstico completo.
+    </p>
+
+    <div class="business-features-grid">
+
+      <div class="biz-card">
+        <div class="biz-card-icon" style="background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        </div>
+        <h3>Diagnóstico Geral</h3>
+        <p>Um parágrafo consultivo real sobre sua saúde financeira — citando seus números, seus gastos e suas tendências.</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="biz-card-icon" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3>Tendência por Categoria</h3>
+        <p>Cada categoria mostra se o gasto está <span style="color:#f87171">↑ crescendo</span>, <span style="color:#34d399">↓ caindo</span> ou <span style="color:#64748b">→ estável</span> comparado ao histórico.</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="biz-card-icon" style="background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h3>Gráfico de Evolução</h3>
+        <p>Visualize entradas vs saídas mês a mês. Identifique o padrão e decida onde agir.</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="biz-card-icon" style="background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3>Assinaturas Detectadas</h3>
+        <p>Identifica automaticamente cada assinatura ativa e classifica como <span style="color:#34d399">essencial</span> ou <span style="color:#f87171">dispensável</span>.</p>
+      </div>
+
+      <div class="biz-card">
+        <div class="biz-card-icon" style="background:rgba(201,168,76,.1);border-color:rgba(201,168,76,.25)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <h3>Recomendações de Corte</h3>
+        <p>Onde cortar e quanto economizar — com nome do gasto e valor exato. Não genérico: específico para você.</p>
+      </div>
+
+      <div class="biz-card biz-card-highlight">
+        <div class="biz-card-icon" style="background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.35)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h3>Próximos Passos</h3>
+        <p>Ações concretas e priorizadas para você agir imediatamente — não conselhos vagos, mas um plano real.</p>
+      </div>
+
+    </div>
+
+    <div style="margin-top:40px;text-align:center">
+      <button class="btn-primary btn-lg buyPlan" data-plan="business" data-type="subscription" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);border:none">
+        ★ Começar com Business — R$15,90/mês
+      </button>
+      <div style="font-size:12px;color:var(--text-dim);margin-top:10px">Cancele quando quiser · Sem fidelidade</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Planos</div>
+  <h2 class="section-title">Simples e transparente.</h2>
+  <div class="plans-grid">
+
+    <div class="plan-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">R$<span>0</span></div>
+      <div class="plan-period">para sempre</div>
+      <ul class="plan-features">
+        <li>✓ 10 análises por mês</li>
+        <li>✓ Categorização automática</li>
+        <li>✓ Score financeiro</li>
+        <li class="dimmed">✗ Histórico ilimitado</li>
+        <li class="dimmed">✗ Alertas financeiros</li>
+      </ul>
+      <button class="btn-outline plan-cta-btn" data-action="register">Começar grátis</button>
+    </div>
+
+    <div class="plan-card featured">
+      <div class="plan-badge">Mais popular</div>
+      <div class="plan-name">Pro</div>
+      <div class="plan-price">R$<span>8,90</span></div>
+      <div class="plan-period">por mês</div>
+      <ul class="plan-features">
+        <li>✓ Análises ilimitadas</li>
+        <li>✓ Categorização automática</li>
+        <li>✓ Score financeiro</li>
+        <li>✓ Histórico ilimitado</li>
+        <li>✓ Alertas financeiros</li>
+      </ul>
+      <button class="btn-primary buyPlan" data-plan="pro" data-type="subscription">Assinar Pro →</button>
+    </div>
+
+    <div class="plan-card plan-card-business-highlight">
+      <div class="plan-name" style="color:#a78bfa">Business</div>
+      <div class="plan-price">R$<span>15,90</span></div>
+      <div class="plan-period">por mês</div>
+      <ul class="plan-features">
+        <li>✓ Tudo do Pro</li>
+        <li style="color:#a78bfa;font-weight:500">★ IA Gemini 2.5 Pro — modelo mais avançado</li>
+        <li>✓ Diagnóstico consultivo completo</li>
+        <li>✓ Gráfico de evolução mensal</li>
+        <li>✓ Detecção de assinaturas + badge essencial</li>
+        <li>✓ Tendência por categoria (↑↓→)</li>
+        <li>✓ Próximos passos priorizados</li>
+        <li>✓ Recomendações de corte com valores</li>
+        <li>✓ Médias mensais de entradas/saídas</li>
+        <li>✓ Suporte via WhatsApp</li>
+      </ul>
+      <button class="btn-business buyPlan" data-plan="business" data-type="subscription">Assinar Business →</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- SUPORTE -->
+<section class="support" id="suporte">
+  <div class="section-label">Precisa de ajuda?</div>
+  <h2 class="section-title">Fale com a gente.</h2>
+  <div class="support-grid">
+    <a href="https://wa.me/5511978257861?text=Olá,%20preciso%20de%20ajuda%20com%20o%20Analyza" target="_blank" class="support-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="48" height="48" alt="WhatsApp" style="border-radius:12px">
+      <div class="support-name">WhatsApp</div>
+      <div class="support-desc">Atendimento rápido. Resposta em até 1h.</div>
+      <div class="support-link">Abrir conversa →</div>
+    </a>
+    <a href="https://t.me/analyzaIA" target="_blank" class="support-card">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg" width="48" height="48" alt="Telegram" style="border-radius:12px">
+      <div class="support-name">Telegram</div>
+      <div class="support-desc">Canal de suporte e novidades no Telegram.</div>
+      <div class="support-link">Abrir Telegram →</div>
+    </a>
+  </div>
+</section>
+
+<!-- TRUST SECTION -->
+<section class="trust-section">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <div class="trust-icon">🔒</div>
+      <div class="trust-text">
+        <div class="trust-title">Seus dados são seus</div>
+        <div class="trust-sub">Seu extrato é processado e imediatamente descartado. Nunca armazenamos dados bancários.</div>
+      </div>
+    </div>
+    <div class="trust-divider"></div>
+    <div class="trust-item">
+      <div class="trust-icon">🤖</div>
+      <div class="trust-text">
+        <div class="trust-title">IA de ponta</div>
+        <div class="trust-sub">Free/Pro: Gemini 2.5 Flash · Business: Gemini 2.5 Pro — os modelos mais avançados do Google.</div>
+      </div>
+    </div>
+    <div class="trust-divider"></div>
+    <div class="trust-item">
+      <div class="trust-icon">⚡</div>
+      <div class="trust-text">
+        <div class="trust-title">Análise em segundos</div>
+        <div class="trust-sub">Resultados instantâneos. Sem espera, sem burocracia.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <div class="footer-logo"><img src="logo-full.png" class="logo-full-img footer-logo-img" alt="Analyza"></div>
+      <div class="footer-tagline">Inteligência financeira para todos.</div>
+      <div class="footer-copy">© 2025 Analyza. Todos os direitos reservados.</div>
+    </div>
+    <div class="footer-links">
+      <div class="footer-col">
+        <div class="footer-col-title">Produto</div>
+        <a href="#features">Funcionalidades</a>
+        <a href="#pricing">Planos</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Legal</div>
+        <a href="termos.html" target="_blank">Termos de Uso</a>
+        <a href="privacidade.html" target="_blank">Privacidade</a>
+        <a href="#suporte">Suporte</a>
+      </div>
+    </div>
+  </div>
+</footer>
+<div class="mini-legal">
+  <a href="termos.html" target="_blank">Termos de Uso</a> ·
+  <a href="privacidade.html" target="_blank">Privacidade</a> ·
+  <span>© 2025 Analyza</span>
+</div>
+
+<!-- MODAL AUTH -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div class="modal-tabs">
+      <button class="tab-btn active" id="tabLogin">Entrar</button>
+      <button class="tab-btn" id="tabRegister">Criar conta</button>
+    </div>
+    <div id="googleSignInWrapper">
+      <div id="g_id_onload"
+        data-client_id="113804139265-aesb8l8fubb6iqvqs6oc2jlc1hjripvr.apps.googleusercontent.com"
+        data-callback="handleGoogleCredential"
+        data-ux_mode="popup"
+        data-auto_prompt="false"></div>
+      <div id="googleBtnContainer" style="display:flex;justify-content:center;min-height:44px"></div>
+      <div class="auth-divider"><span>ou</span></div>
+    </div>
+    <div id="formLogin">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-primary full" id="doLogin">Entrar</button>
+      <div class="form-msg" id="loginMsg"></div>
+    </div>
+    <div id="formRegister" style="display:none">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;justify-content:space-between">
+          CPF <span id="cpfHint" style="font-size:11px;font-weight:500;transition:color .2s"></span>
+        </label>
+        <input type="text" id="regDocument" placeholder="000.000.000-00" maxlength="14" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div style="margin-top:14px">
+        <div class="h-captcha" data-sitekey="fdb438ec-aa84-49c8-8e24-144ec786bb66" data-theme="dark"></div>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:10px;margin-top:16px;cursor:pointer;font-size:13px;color:var(--text-dim);line-height:1.5">
+        <input type="checkbox" id="regAgeCheck" style="margin-top:2px;accent-color:var(--gold);width:16px;height:16px;flex-shrink:0">
+        <span>Confirmo ter pelo menos 18 anos ou estar autorizado pelo responsável.</span>
+      </label>
+      <button class="btn-primary full" id="doRegister" style="margin-top:16px">Criar conta</button>
+      <div class="form-msg" id="registerMsg"></div>
+    </div>
+  </div>
+</div>
+
+<script src="script.js?v=2"></script>
+<script src="payment.js?v=2"></script>
+
+<script>
+// ── Hero button: cadastro se deslogado, dashboard se logado ──────────────────
+// Nota: o estado de sessão real é controlado por cookies HTTPOnly.
+// O script.js faz a verificação via /api/me/status e atualiza o header + hero se logado.
+// Aqui só definimos o estado padrão (deslogado).
+(function() {
+  const btn = document.getElementById("heroMainBtn")
+  // Sempre inicia como deslogado — script.js atualiza se houver sessão válida
+  btn.onclick = () => {
+    document.getElementById("authModal").classList.add("open")
+    document.getElementById("tabRegister").click()
+  }
+
+  // Plan cards free button
+  document.querySelectorAll(".plan-cta-btn[data-action='register']").forEach(b => {
+    b.onclick = () => {
+      document.getElementById("authModal").classList.add("open")
+      document.getElementById("tabRegister").click()
+    }
+  })
+
+  // Mobile buttons
+  const ml = document.getElementById("mobileLoginBtn")
+  const mr = document.getElementById("mobileRegisterBtn")
+  if (ml) ml.onclick = () => { closeMobileNav(); document.getElementById("loginBtn").click() }
+  if (mr) mr.onclick = () => { closeMobileNav(); document.getElementById("registerBtn").click() }
+
+  // Limpar token antigo do localStorage (migração para HTTPOnly cookies)
+  localStorage.removeItem("analyza_token")
+})()
+
+// ── Mobile nav ────────────────────────────────────────────────────────────────
+const mobileMenuBtn = document.getElementById("mobileMenuBtn")
+const mobileNav = document.getElementById("mobileNav")
+function closeMobileNav() {
+  mobileNav.classList.remove("open")
+  mobileMenuBtn.classList.remove("open")
+}
+mobileMenuBtn.addEventListener("click", () => {
+  mobileNav.classList.toggle("open")
+  mobileMenuBtn.classList.toggle("open")
+})
+document.querySelectorAll(".mobile-nav-link").forEach(a => {
+  a.addEventListener("click", closeMobileNav)
+})
+</script>
+
+<script>
+// ── Typewriter hero ──────────────────────────────────────────────────────────
+(function() {
+  const line2El  = document.getElementById("heroLine2")
+  const cursorEl = document.getElementById("heroCursor")
+  const reveals  = document.querySelectorAll(".anim-reveal")
+  const text     = "inteligente."
+  let i = 0
+
+  const line1 = document.getElementById("heroLine1")
+  line1.style.opacity = "0"
+  line1.style.transform = "translateY(10px)"
+  line1.style.transition = "opacity .5s ease, transform .5s ease"
+  setTimeout(() => { line1.style.opacity = "1"; line1.style.transform = "translateY(0)" }, 200)
+
+  function type() {
+    if (i < text.length) {
+      line2El.textContent += text[i]; i++
+      const delay = text[i-1] === "." ? 280 : 55 + Math.random() * 45
+      setTimeout(type, delay)
+    } else {
+      setTimeout(() => { cursorEl.style.animation = "none"; cursorEl.style.opacity = "0" }, 900)
+      reveals.forEach((el, idx) => {
+        setTimeout(() => {
+          el.style.transition = "opacity .6s ease, transform .6s ease"
+          el.style.transform  = "translateY(14px)"
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            el.style.opacity = "1"; el.style.transform = "translateY(0)"
+          }))
+        }, 150 + idx * 130)
+      })
+    }
+  }
+  setTimeout(type, 750)
+})()
+</script>
+
+<script>
+// ── Scroll reveal ─────────────────────────────────────────────────────────────
+(function() {
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add("visible"), parseFloat(e.target.dataset.revealDelay || 0))
+        obs.unobserve(e.target)
+      }
+    })
+  }, { threshold: 0.1 })
+
+  ;[
+    [".feature-card", 120],
+    [".plan-card",    100],
+    [".biz-card",     110],
+    [".trust-item",   130],
+    [".support-card", 150],
+    [".social-proof-item", 80],
+  ].forEach(([sel, delay]) => {
+    document.querySelectorAll(sel).forEach((el, i) => {
+      el.dataset.revealDelay = i * delay
+      obs.observe(el)
+    })
+  })
+})()
+</script>
+
+</body>
+</html>

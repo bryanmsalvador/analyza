@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Política de Privacidade — Analyza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpeg" href="logo-a.jpg">
+  <style>
+    .legal-wrap { max-width: 760px; margin: 0 auto; padding: 60px 24px 100px; }
+    .legal-header { margin-bottom: 48px; }
+    .legal-back { font-size: 13px; color: var(--text-dim); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 24px; transition: color .2s; }
+    .legal-back:hover { color: var(--text); }
+    .legal-title { font-family: var(--font-display); font-size: 40px; margin-bottom: 8px; }
+    .legal-date  { font-size: 13px; color: var(--text-dim); }
+    .legal-body h2 { font-family: var(--font-display); font-size: 20px; margin: 40px 0 14px; color: var(--gold); }
+    .legal-body p, .legal-body li { font-size: 14px; color: var(--text-dim); line-height: 1.85; margin-bottom: 12px; }
+    .legal-body ul { padding-left: 20px; }
+    .legal-body strong { color: var(--text); }
+    .legal-body a { color: var(--gold); }
+    .legal-divider { height: 1px; background: var(--border); margin: 32px 0; }
+    .data-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+    .data-table th { text-align: left; padding: 10px 12px; background: var(--surface2); color: var(--text-dim); font-weight: 500; border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 10px 12px; color: var(--text-dim); border-bottom: 1px solid var(--border); vertical-align: top; }
+  </style>
+</head>
+<body>
+<div class="bg-orb orb1"></div>
+
+<div class="legal-wrap">
+  <div class="legal-header">
+    <a href="index.html" class="legal-back">← Voltar ao início</a>
+    <div class="legal-title">Política de Privacidade</div>
+    <div class="legal-date">Última atualização: março de 2025</div>
+  </div>
+
+  <div class="legal-body">
+
+    <p>A <strong>Analyza</strong> leva a privacidade dos seus dados a sério. Esta política explica quais dados coletamos, como usamos e como protegemos suas informações, em conformidade com a <strong>Lei Geral de Proteção de Dados (LGPD — Lei nº 13.709/2018)</strong>.</p>
+
+    <div class="legal-divider"></div>
+
+    <h2>1. Dados que Coletamos</h2>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Dado</th>
+          <th>Finalidade</th>
+          <th>Base Legal (LGPD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>E-mail</strong></td>
+          <td>Identificação e autenticação da conta</td>
+          <td>Execução de contrato</td>
+        </tr>
+        <tr>
+          <td><strong>CPF</strong></td>
+          <td>Prevenção de fraudes e processamento de pagamentos</td>
+          <td>Legítimo interesse / Obrigação legal</td>
+        </tr>
+        <tr>
+          <td><strong>Senha (hash)</strong></td>
+          <td>Autenticação segura — nunca armazenamos senha em texto puro</td>
+          <td>Execução de contrato</td>
+        </tr>
+        <tr>
+          <td><strong>Endereço IP</strong></td>
+          <td>Segurança, prevenção de múltiplas contas e logs de acesso</td>
+          <td>Legítimo interesse</td>
+        </tr>
+        <tr>
+          <td><strong>Dados de pagamento</strong></td>
+          <td>Processamento financeiro via PIX (não armazenamos dados bancários)</td>
+          <td>Execução de contrato</td>
+        </tr>
+        <tr>
+          <td><strong>Extrato enviado</strong></td>
+          <td>Processamento temporário para geração da análise por IA</td>
+          <td>Consentimento / Execução de contrato</td>
+        </tr>
+        <tr>
+          <td><strong>Resultado das análises</strong></td>
+          <td>Exibição do histórico no dashboard do usuário</td>
+          <td>Consentimento</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>2. O que NÃO Fazemos</h2>
+    <ul>
+      <li><strong>Não vendemos seus dados</strong> para terceiros, jamais.</li>
+      <li><strong>Não armazenamos seu extrato bancário</strong> — ele é processado e descartado após a análise.</li>
+      <li><strong>Não compartilhamos seus dados</strong> com anunciantes ou plataformas de marketing.</li>
+      <li><strong>Não realizamos decisões automatizadas</strong> com consequências legais ou significativas sem revisão humana.</li>
+    </ul>
+
+    <h2>3. Como Protegemos seus Dados</h2>
+    <ul>
+      <li>Senhas são armazenadas com hash bcrypt (irreversível).</li>
+      <li>Toda comunicação é feita via HTTPS/TLS.</li>
+      <li>Banco de dados hospedado com restrições de acesso por IP e autenticação em dois fatores.</li>
+      <li>Tokens de acesso (JWT) têm validade limitada.</li>
+      <li>Logs de atividade são auditados periodicamente.</li>
+    </ul>
+
+    <h2>4. Compartilhamento com Terceiros</h2>
+    <p>Compartilhamos dados apenas com os seguintes parceiros, estritamente necessários para o funcionamento do serviço:</p>
+    <ul>
+      <li><strong>Google (Gemini API)</strong> — processamento do extrato para geração da análise. Os dados são transmitidos de forma segura e sujeitos à <a href="https://policies.google.com/privacy" target="_blank">Política de Privacidade do Google</a>.</li>
+      <li><strong>Supabase</strong> — banco de dados e autenticação. Dados hospedados em servidores com certificação SOC 2.</li>
+      <li><strong>Poseidon Pay</strong> — processamento de pagamentos via PIX. Não compartilhamos dados bancários além do necessário para a transação.</li>
+      <li><strong>hCaptcha</strong> — verificação anti-bot no cadastro.</li>
+    </ul>
+
+    <h2>5. Seus Direitos (LGPD)</h2>
+    <p>Como titular de dados, você tem direito a:</p>
+    <ul>
+      <li><strong>Acesso</strong> — saber quais dados temos sobre você;</li>
+      <li><strong>Correção</strong> — atualizar dados incorretos ou desatualizados;</li>
+      <li><strong>Eliminação</strong> — solicitar a exclusão dos seus dados da plataforma;</li>
+      <li><strong>Portabilidade</strong> — receber seus dados em formato estruturado;</li>
+      <li><strong>Revogação do consentimento</strong> — a qualquer momento, sem prejuízo;</li>
+      <li><strong>Oposição</strong> — contestar o tratamento com base em legítimo interesse.</li>
+    </ul>
+    <p>Para exercer qualquer desses direitos, entre em contato pelo <a href="https://wa.me/5511978257861">WhatsApp</a> ou <a href="https://t.me/analyzaIA">Telegram</a>.</p>
+
+    <h2>6. Retenção de Dados</h2>
+    <ul>
+      <li>Dados da conta são mantidos enquanto a conta estiver ativa.</li>
+      <li>Após a exclusão da conta, os dados são removidos em até 30 dias.</li>
+      <li>Logs de acesso são mantidos por até 6 meses para fins de segurança.</li>
+      <li>Dados de pagamento são mantidos pelo período exigido por lei (5 anos).</li>
+    </ul>
+
+    <h2>7. Cookies e Rastreamento</h2>
+    <p>A Analyza não utiliza cookies de rastreamento ou publicidade. Utilizamos apenas o armazenamento local do navegador (<em>localStorage</em>) para manter sua sessão ativa. Não há rastreamento entre sites.</p>
+
+    <h2>8. Menores de Idade</h2>
+    <p>Nosso serviço não é direcionado a menores de 18 anos. Se soubermos que coletamos dados de um menor sem autorização, excluiremos imediatamente.</p>
+
+    <h2>9. Alterações nesta Política</h2>
+    <p>Podemos atualizar esta política periodicamente. Alterações significativas serão comunicadas por e-mail com antecedência de 15 dias. O uso continuado após as alterações implica aceitação.</p>
+
+    <h2>10. Encarregado de Dados (DPO)</h2>
+    <p>Para questões relacionadas à privacidade e proteção de dados, entre em contato:<br>
+    <strong>E-mail:</strong> <a href="mailto:bryanmarcondes3@gmail.com">bryanmarcondes3@gmail.com</a><br>
+    <strong>WhatsApp:</strong> <a href="https://wa.me/5511978257861">+55 11 97825-7861</a></p>
+
+  </div>
+</div>
+</body>
+</html>

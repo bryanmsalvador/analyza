@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 100">
+  <!-- Outer A shape -->
+  <polygon points="45,2 90,98 68,98 45,45 22,98 0,98" fill="#f5d800"/>
+  <!-- Inner triangle cutout (dark/negative space) -->
+  <polygon points="45,30 62,72 28,72" fill="#0a0a10"/>
+  <!-- White diagonal slash across the crossbar -->
+  <polygon points="20,76 70,62 70,70 20,84" fill="white"/>
+</svg>

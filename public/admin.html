@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analyza — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpeg" href="logo-a.jpg">
+  <style>
+    /* ── Admin specifics ──────────────────────────────────────────────────────── */
+    .admin-toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:20px }
+    .admin-filter-label { font-size:13px; color:var(--text-dim) }
+    .admin-filter-select {
+      background:var(--surface); border:1px solid var(--border); color:var(--text);
+      padding:7px 12px; border-radius:8px; font-size:13px; cursor:pointer; outline:none;
+    }
+    .admin-filter-select:focus { border-color:var(--gold) }
+
+    .admin-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:12px; margin-bottom:24px }
+    .admin-stat {
+      background:rgba(22,22,32,.7); border:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(12px); border-radius:14px; padding:18px 20px;
+    }
+    .admin-stat-val { font-size:26px; font-family:var(--font-display); color:var(--gold); line-height:1 }
+    .admin-stat-label { font-size:12px; color:var(--text-dim); margin-top:6px }
+
+    .plan-select {
+      background:var(--surface); border:1px solid var(--border); color:var(--text);
+      padding:4px 8px; border-radius:6px; font-size:12px; cursor:pointer; outline:none;
+    }
+    .btn-action { padding:4px 10px; border-radius:6px; font-size:12px; cursor:pointer; border:1px solid; white-space:nowrap }
+    .btn-block   { background:rgba(248,113,113,.1); border-color:rgba(248,113,113,.3); color:#f87171 }
+    .btn-unblock { background:rgba(52,211,153,.1);  border-color:rgba(52,211,153,.3);  color:#34d399 }
+    .btn-promote { background:rgba(201,168,76,.1);  border-color:rgba(201,168,76,.3);  color:var(--gold) }
+    .badge.admin { background:rgba(201,168,76,.15); color:var(--gold) }
+
+    /* Sidebar */
+    .admin-sidebar-logo {
+      display:flex; align-items:center;
+      margin-bottom:8px; padding:0 4px;
+    }
+    .admin-sidebar-logo img { height:32px; width:auto; object-fit:contain }
+    .admin-who {
+      font-size:11px; color:var(--text-dim); padding:0 8px;
+      margin-bottom:28px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .sidebar-link .icon { font-size:15px; flex-shrink:0 }
+
+    /* Payment badge */
+    .pay-status {
+      display:inline-block; padding:2px 8px; border-radius:20px;
+      font-size:11px; font-weight:600; white-space:nowrap;
+    }
+    .pay-status.paid    { background:rgba(52,211,153,.12); color:#34d399; border:1px solid rgba(52,211,153,.25) }
+    .pay-status.pending { background:rgba(251,191,36,.12);  color:#fbbf24; border:1px solid rgba(251,191,36,.25) }
+    .pay-status.failed  { background:rgba(248,113,113,.12); color:#f87171; border:1px solid rgba(248,113,113,.25) }
+    .pay-status.refunded{ background:rgba(148,163,184,.12); color:#94a3b8; border:1px solid rgba(148,163,184,.25) }
+
+    .pay-method {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:11px; padding:2px 7px; border-radius:20px;
+      background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+    }
+
+    /* Mobile hamburger */
+    #sidebarToggle {
+      display:none; position:fixed; top:14px; left:14px; z-index:200;
+      background:var(--surface); border:1px solid var(--border); border-radius:10px;
+      padding:8px 10px; cursor:pointer; color:var(--text); font-size:18px; line-height:1;
+    }
+    #sidebarOverlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:149 }
+
+    /* Login screen */
+    #adminLoginScreen {
+      position:fixed; inset:0; background:var(--bg);
+      display:flex; align-items:center; justify-content:center; z-index:999;
+    }
+    .admin-login-card {
+      background:rgba(22,22,32,.85); backdrop-filter:blur(24px);
+      border:1px solid rgba(255,255,255,.08); border-radius:24px;
+      padding:48px 40px; width:100%; max-width:380px; text-align:center;
+      box-shadow:0 24px 64px rgba(0,0,0,.5);
+    }
+    .admin-login-card h2 { font-family:var(--font-display); font-size:22px; margin-bottom:6px }
+    .admin-login-card p  { font-size:13px; color:var(--text-dim); margin-bottom:28px }
+
+    @media (max-width: 768px) {
+      #sidebarToggle { display:flex; align-items:center; justify-content:center }
+      #adminPanel.dash-layout { grid-template-columns:1fr !important }
+      .dash-sidebar {
+        position:fixed !important; top:0; left:-260px; width:240px;
+        height:100vh !important; z-index:150; transition:left .25s ease;
+        padding:28px 16px !important; border-right:1px solid var(--border) !important;
+      }
+      .dash-sidebar.open { left:0 }
+      #sidebarOverlay.open { display:block }
+      .dash-main { padding:20px 16px !important; padding-top:60px !important }
+      .sidebar-nav { flex-direction:column !important }
+      .sidebar-link { font-size:14px !important; padding:10px 12px !important }
+      .admin-stats { grid-template-columns:1fr 1fr }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+
+<!-- LOGIN -->
+<div id="adminLoginScreen">
+  <div class="admin-login-card">
+    <div class="logo" style="justify-content:center;margin-bottom:20px;font-size:22px">
+      <img src="logo-full.png" class="logo-full-img" alt="Analyza">
+    </div>
+    <h2>Painel Admin</h2>
+    <p>Acesso restrito a administradores</p>
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="adminEmail" placeholder="admin@email.com" autocomplete="email">
+    </div>
+    <div class="form-group" style="margin-top:12px">
+      <label>Senha</label>
+      <input type="password" id="adminPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-primary full" id="doAdminLogin" style="margin-top:20px">Entrar</button>
+    <div class="form-msg" id="adminLoginMsg" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<button id="sidebarToggle" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+<div id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- PAINEL -->
+<div class="dash-layout" id="adminPanel" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="dash-sidebar admin-sidebar" id="adminSidebar">
+
+    <!-- Logo -->
+    <div class="asb-logo">
+      <img src="logo-full.png" alt="Analyza" style="height:36px;width:auto;object-fit:contain;display:block">
+    </div>
+
+    <!-- Admin info -->
+    <div class="asb-user">
+      <div class="asb-user-avatar" id="adminAvatarInitial">A</div>
+      <div class="asb-user-info">
+        <div class="asb-user-email" id="adminWho">—</div>
+        <div class="asb-user-badge" id="adminFounderBadge"></div>
+      </div>
+    </div>
+
+    <div class="asb-divider"></div>
+
+    <!-- Nav -->
+    <nav class="sidebar-nav asb-nav">
+      <button class="sidebar-link active" data-view="users">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuários
+      </button>
+      <button class="sidebar-link" data-view="payments">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Pagamentos
+      </button>
+      <button class="sidebar-link" data-view="analyses">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Análises
+      </button>
+      <button class="sidebar-link" data-view="admins">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Admins
+      </button>
+      <button class="sidebar-link" data-view="logs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Logs
+      </button>
+    </nav>
+
+    <div style="flex:1"></div>
+
+    <div class="asb-divider"></div>
+    <button class="sidebar-link asb-logout" id="logoutBtn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sair
+    </button>
+
+  </aside>
+
+  <!-- Main -->
+  <main class="dash-main">
+
+    <!-- ── USUÁRIOS ─────────────────────────────────────────────────────────── -->
+    <div id="view-users">
+      <div class="dash-title">Usuários</div>
+      <div class="dash-subtitle">Gerencie todos os usuários da plataforma</div>
+
+      <div class="admin-stats" id="adminStats">
+        <div class="admin-stat"><div class="admin-stat-val" id="statTotal">—</div><div class="admin-stat-label">Total</div></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="statFree">—</div><div class="admin-stat-label">Free</div></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="statPro">—</div><div class="admin-stat-label">Pro</div></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="statBusiness">—</div><div class="admin-stat-label">Business</div></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="statBlocked">—</div><div class="admin-stat-label">Bloqueados</div></div>
+      </div>
+
+      <div class="admin-toolbar">
+        <span class="admin-filter-label">Plano:</span>
+        <select class="admin-filter-select" id="planFilter">
+          <option value="all">Todos</option>
+          <option value="free">Free</option>
+          <option value="pro">Pro</option>
+          <option value="business">Business</option>
+        </select>
+        <input type="text" id="userSearch" placeholder="🔍  Buscar por email ou nome…"
+          style="background:var(--surface);border:1px solid var(--border);color:var(--text);
+                 padding:7px 12px;border-radius:8px;font-size:13px;outline:none;min-width:200px"
+          oninput="filterUsersTable(this.value)">
+        <button class="btn-ghost" id="refreshUsers" style="padding:7px 16px;font-size:13px">↻ Atualizar</button>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="admin-table" id="usersTable">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Nome</th>
+              <th>CPF</th>
+              <th>Origem</th>
+              <th>IP Cadastro</th>
+              <th>Plano</th>
+              <th>Análises</th>
+              <th>Status</th>
+              <th>Cadastro</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="usersBody">
+            <tr><td colspan="10" style="color:var(--text-dim);padding:20px">Carregando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── PAGAMENTOS ────────────────────────────────────────────────────────── -->
+    <div id="view-payments" class="hidden">
+      <div class="dash-title">Pagamentos</div>
+      <div class="dash-subtitle">Histórico completo de compras e assinaturas</div>
+
+      <div class="admin-stats" id="payStats">
+        <div class="admin-stat"><div class="admin-stat-val" id="statPayTotal">—</div><div class="admin-stat-label">Total</div></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="statPayPaid">—</div><div class="admin-stat-label">Aprovados</div></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="statPayPending">—</div><div class="admin-stat-label">Pendentes</div></div>
+        <div class="admin-stat"><div class="admin-stat-val" id="statPayRevenue">—</div><div class="admin-stat-label">Receita total</div></div>
+      </div>
+
+      <div class="admin-toolbar">
+        <span class="admin-filter-label">Status:</span>
+        <select class="admin-filter-select" id="payStatusFilter">
+          <option value="all">Todos</option>
+          <option value="paid">Aprovados</option>
+          <option value="pending">Pendentes</option>
+          <option value="failed">Recusados</option>
+          <option value="refunded">Reembolsados</option>
+        </select>
+        <span class="admin-filter-label">Método:</span>
+        <select class="admin-filter-select" id="payMethodFilter">
+          <option value="all">Todos</option>
+          <option value="pix">PIX</option>
+          <option value="card">Cartão</option>
+        </select>
+        <button class="btn-ghost" id="refreshPayments" style="padding:7px 16px;font-size:13px">↻ Atualizar</button>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="admin-table" id="paymentsTable">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Usuário</th>
+              <th>Email</th>
+              <th>CPF</th>
+              <th>IP</th>
+              <th>Plano</th>
+              <th>Valor</th>
+              <th>Método</th>
+              <th>Status</th>
+              <th>ID Transação</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsBody">
+            <tr><td colspan="10" style="color:var(--text-dim);padding:20px">Carregando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ANÁLISES ──────────────────────────────────────────────────────────── -->
+    <div id="view-analyses" class="hidden">
+      <div class="dash-title">Análises</div>
+      <div class="dash-subtitle">Últimas 100 análises realizadas</div>
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead>
+            <tr><th>ID</th><th>Usuário</th><th>Data</th></tr>
+          </thead>
+          <tbody id="analysesBody">
+            <tr><td colspan="3" style="color:var(--text-dim);padding:20px">Carregando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── LOGS ──────────────────────────────────────────────────────────────── -->
+    <div id="view-logs" class="hidden">
+      <div class="dash-title">Logs de Atividade</div>
+      <div class="dash-subtitle">Registro de todas as ações com IP</div>
+      <div style="overflow-x:auto;width:100%">
+        <table class="admin-table" style="width:100%;min-width:700px">
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>Usuário</th>
+              <th>Ação</th>
+              <th>IP</th>
+              <th>Detalhe</th>
+            </tr>
+          </thead>
+          <tbody id="logsBody">
+            <tr><td colspan="5" style="color:var(--text-dim);padding:20px">Carregando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ADMINS ────────────────────────────────────────────────────────────── -->
+    <div id="view-admins" class="hidden">
+      <div class="dash-title">Administradores</div>
+      <div class="dash-subtitle">Gerencie quem tem acesso ao painel admin</div>
+
+      <div style="background:rgba(22,22,32,.7);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:28px;max-width:480px;margin-bottom:32px">
+        <div style="font-size:14px;font-weight:500;margin-bottom:16px">Promover usuário a admin</div>
+        <div class="form-group">
+          <label>Email do usuário</label>
+          <input type="email" id="promoteEmail" placeholder="usuario@email.com">
+        </div>
+        <button class="btn-primary" id="doPromote" style="margin-top:16px">Promover a admin</button>
+        <div class="form-msg" id="promoteMsg" style="margin-top:10px"></div>
+      </div>
+
+      <div style="overflow-x:auto">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Email</th><th>Nome</th><th>Cadastro</th></tr>
+          </thead>
+          <tbody id="adminsBody">
+            <tr><td colspan="3" style="color:var(--text-dim);padding:20px">Carregando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+
+// Escape HTML para prevenir XSS ────────────────────────────────────────────
+function esc(str) {
+  if (str === null || str === undefined) return ""
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+}
+
+let adminToken = sessionStorage.getItem("analyza_admin_token") || ""
+let isFounder  = false
+let allUsers   = []
+let allPayments = []
+
+// ── Login ─────────────────────────────────────────────────────────────────────
+document.getElementById("doAdminLogin").onclick = async () => {
+  const email = document.getElementById("adminEmail").value.trim()
+  const pass  = document.getElementById("adminPassword").value
+  const msg   = document.getElementById("adminLoginMsg")
+  if (!email || !pass) { msg.textContent = "Preencha email e senha"; msg.className = "form-msg error"; return }
+  try {
+    const res  = await fetch("/api/admin/login", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ email, password:pass }) })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || "Erro ao entrar")
+    adminToken = data.token
+    sessionStorage.setItem("analyza_admin_token", adminToken)
+    showPanel(data.isFounder)
+  } catch (err) { msg.textContent = err.message; msg.className = "form-msg error" }
+}
+
+// ── Show panel ────────────────────────────────────────────────────────────────
+async function showPanel(founderFromLogin) {
+  document.getElementById("adminLoginScreen").style.display = "none"
+  document.getElementById("adminPanel").style.display = "flex"
+  try {
+    const r = await fetch("/api/admin/me", { headers:{"Authorization":`Bearer ${adminToken}`} })
+    const d = await r.json()
+    isFounder = d.is_founder || founderFromLogin || false
+    const email = d.email || ""
+    document.getElementById("adminWho").textContent = email
+
+    // Avatar initial
+    const avatarEl = document.getElementById("adminAvatarInitial")
+    if (avatarEl) avatarEl.textContent = (email[0] || "A").toUpperCase()
+
+    // Founder badge
+    const badgeEl = document.getElementById("adminFounderBadge")
+    if (badgeEl && isFounder) {
+      badgeEl.innerHTML = `<span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);color:var(--gold)">👑 Fundador</span>`
+    }
+  } catch {}
+  loadUsers()
+}
+if (adminToken) showPanel()
+
+// ── Logout ────────────────────────────────────────────────────────────────────
+document.getElementById("logoutBtn").onclick = () => { sessionStorage.removeItem("analyza_admin_token"); location.reload() }
+
+// ── Navegação ─────────────────────────────────────────────────────────────────
+const views = ["users","payments","analyses","admins","logs"]
+document.querySelectorAll(".sidebar-link[data-view]").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".sidebar-link").forEach(b => b.classList.remove("active"))
+    btn.classList.add("active")
+    const v = btn.dataset.view
+    views.forEach(x => document.getElementById(`view-${x}`).classList.toggle("hidden", x !== v))
+    if (v === "payments") loadPayments()
+    if (v === "analyses") loadAnalyses()
+    if (v === "admins")   loadAdmins()
+    if (v === "logs")     loadLogs()
+    closeSidebar()
+  }
+})
+
+// ── Mobile sidebar ────────────────────────────────────────────────────────────
+function toggleSidebar() { document.getElementById("adminSidebar").classList.toggle("open"); document.getElementById("sidebarOverlay").classList.toggle("open") }
+function closeSidebar()  { document.getElementById("adminSidebar").classList.remove("open"); document.getElementById("sidebarOverlay").classList.remove("open") }
+
+// ── Usuários ──────────────────────────────────────────────────────────────────
+document.getElementById("planFilter").onchange = () => loadUsers()
+document.getElementById("refreshUsers").onclick = () => loadUsers()
+
+async function loadUsers() {
+  const plan  = document.getElementById("planFilter").value
+  const tbody = document.getElementById("usersBody")
+  tbody.innerHTML = `<tr><td colspan="10" style="color:var(--text-dim);padding:20px">Carregando…</td></tr>`
+  try {
+    const url = plan === "all" ? "/api/admin/users" : `/api/admin/users?plan=${plan}`
+    const res  = await fetch(url, { headers:{"Authorization":`Bearer ${adminToken}`} })
+    if (!res.ok) throw new Error("Erro " + res.status)
+    allUsers = await res.json()
+    document.getElementById("statTotal").textContent   = allUsers.length
+    document.getElementById("statFree").textContent    = allUsers.filter(u => u.plan === "free").length
+    document.getElementById("statPro").textContent     = allUsers.filter(u => u.plan === "pro").length
+    document.getElementById("statBusiness").textContent= allUsers.filter(u => u.plan === "business").length
+    document.getElementById("statBlocked").textContent = allUsers.filter(u => u.is_blocked).length
+    renderUsers(allUsers)
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="10" style="color:#f87171">Erro: ${err.message}</td></tr>`
+  }
+}
+
+function filterUsersTable(q) {
+  const filtered = q ? allUsers.filter(u => (u.email||"").toLowerCase().includes(q.toLowerCase()) || (u.name||"").toLowerCase().includes(q.toLowerCase())) : allUsers
+  renderUsers(filtered)
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById("usersBody")
+  if (!users.length) { tbody.innerHTML = `<tr><td colspan="10" style="color:var(--text-dim);padding:20px">Nenhum resultado.</td></tr>`; return }
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td style="font-size:12px">${esc(u.email)}</td>
+      <td style="font-size:12px">${esc(u.name) || "—"}</td>
+      <td style="font-size:12px;color:var(--text-dim);font-family:monospace">${esc(u.document) || "—"}</td>
+      <td>
+        ${u.google
+          ? `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(66,133,244,.12);border:1px solid rgba(66,133,244,.3);color:#60a5fa;font-weight:500">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+              Google
+            </span>`
+          : `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:20px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);color:var(--gold);font-weight:500">✦ Analyza</span>`}
+      </td>
+      <td style="font-size:11px;font-family:monospace;color:var(--text-dim)">${esc(u.register_ip) || "—"}</td>
+      <td>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <select class="plan-select" onchange="setPlan('${u.id}', this.value)">
+            <option value="free"     ${u.plan==="free"?"selected":""}>Free</option>
+            <option value="pro"      ${u.plan==="pro"?"selected":""}>Pro</option>
+            <option value="business" ${u.plan==="business"?"selected":""}>Business</option>
+          </select>
+          <button onclick="simulatePayment('${u.id}', '${u.plan === 'free' ? 'pro' : u.plan}')"
+            style="font-size:10px;padding:3px 8px;border-radius:6px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:#34d399;cursor:pointer;font-family:var(--font-body);white-space:nowrap">
+            💳 Simular pagamento
+          </button>
+        </div>
+      </td>
+      <td style="text-align:center">${u.analyses_count ?? 0}</td>
+      <td><span class="badge ${u.is_blocked?"blocked":"active"}">${u.is_blocked?"Bloqueado":"Ativo"}</span></td>
+      <td style="font-size:12px;color:var(--text-dim);white-space:nowrap">${new Date(u.created_at).toLocaleDateString("pt-BR")}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        ${u.is_blocked
+          ? `<button class="btn-action btn-unblock" onclick="toggleBlock('${u.id}',false)">Desbloquear</button>`
+          : `<button class="btn-action btn-block"   onclick="toggleBlock('${u.id}',true)">Bloquear</button>`}
+        ${isFounder
+          ? (!u.is_admin
+              ? `<button class="btn-action btn-promote" onclick="promoteById('${u.id}',true)">+Admin</button>`
+              : `<button class="btn-action" style="background:rgba(248,113,113,.1);border-color:rgba(248,113,113,.3);color:#f87171" onclick="promoteById('${u.id}',false)">-Admin</button>`)
+          : (u.is_admin ? `<span class="badge admin" style="font-size:11px;padding:3px 8px">Admin</span>` : "")}
+      </td>
+    </tr>
+  `).join("")
+}
+
+// ── Pagamentos ────────────────────────────────────────────────────────────────
+document.getElementById("payStatusFilter").onchange  = () => renderPayments()
+document.getElementById("payMethodFilter").onchange  = () => renderPayments()
+document.getElementById("refreshPayments").onclick   = () => loadPayments()
+
+async function loadPayments() {
+  const tbody = document.getElementById("paymentsBody")
+  tbody.innerHTML = `<tr><td colspan="10" style="color:var(--text-dim);padding:20px">Carregando…</td></tr>`
+  try {
+    const res = await fetch("/api/admin/payments", { headers:{"Authorization":`Bearer ${adminToken}`} })
+    if (!res.ok) throw new Error("Erro " + res.status)
+    allPayments = await res.json()
+    // Stats
+    const paid    = allPayments.filter(p => p.status === "paid")
+    const pending = allPayments.filter(p => p.status === "pending")
+    const revenue = paid.reduce((s, p) => s + (p.amount || 0), 0)
+    document.getElementById("statPayTotal").textContent   = allPayments.length
+    document.getElementById("statPayPaid").textContent    = paid.length
+    document.getElementById("statPayPending").textContent = pending.length
+    document.getElementById("statPayRevenue").textContent = `R$${revenue.toFixed(0)}`
+    renderPayments()
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="10" style="color:#f87171">Erro: ${err.message}</td></tr>`
+  }
+}
+
+function renderPayments() {
+  const tbody       = document.getElementById("paymentsBody")
+  const statusFilter = document.getElementById("payStatusFilter").value
+  const methodFilter = document.getElementById("payMethodFilter").value
+
+  let data = allPayments
+  if (statusFilter !== "all") data = data.filter(p => p.status === statusFilter)
+  if (methodFilter !== "all") data = data.filter(p => (p.payment_method || "pix") === methodFilter)
+
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="10" style="color:var(--text-dim);padding:20px">Nenhum resultado.</td></tr>`
+    return
+  }
+
+  const statusLabel = { paid:"paid", pending:"pending", failed:"failed", refunded:"refunded" }
+  const statusText  = { paid:"✓ Aprovado", pending:"⏳ Pendente", failed:"✗ Recusado", refunded:"↩ Reembolso" }
+  const planLabel   = { pro:"Pro ✦", business:"Business ★", free:"Free" }
+  const planColors  = { pro:"var(--gold)", business:"#a78bfa", free:"var(--text-dim)" }
+
+  tbody.innerHTML = data.map(p => {
+    const method = p.payment_method || "pix"
+    const methodIcon = method === "card" ? "💳" : "⚡"
+    const methodName = method === "card" ? "Cartão" : "PIX"
+    return `
+      <tr>
+        <td style="font-size:12px;color:var(--text-dim);white-space:nowrap">${new Date(p.created_at).toLocaleString("pt-BR")}</td>
+        <td style="font-size:12px;font-weight:500">${p.user_name || "—"}</td>
+        <td style="font-size:12px">${p.user_email || "—"}</td>
+        <td style="font-size:11px;font-family:monospace;color:var(--text-dim)">${p.user_document || "—"}</td>
+        <td style="font-size:11px;font-family:monospace;color:var(--text-dim)">${p.user_ip || "—"}</td>
+        <td><span style="font-size:12px;font-weight:600;color:${planColors[p.plan]||"var(--text)"}">${planLabel[p.plan]||p.plan}</span></td>
+        <td style="font-size:13px;font-weight:600;color:#34d399">R$${(p.amount||0).toFixed(2)}</td>
+        <td><span class="pay-method">${methodIcon} ${methodName}</span></td>
+        <td><span class="pay-status ${statusLabel[p.status]||"pending"}">${statusText[p.status]||p.status}</span></td>
+        <td style="font-size:10px;font-family:monospace;color:var(--text-dim);max-width:120px;overflow:hidden;text-overflow:ellipsis" title="${p.transaction_id||"—"}">${p.transaction_id ? p.transaction_id.slice(0,16)+"…" : "—"}</td>
+      </tr>
+    `
+  }).join("")
+}
+
+// ── Simular pagamento aprovado ────────────────────────────────────────────────
+async function simulatePayment(userId, currentPlan) {
+  const plan = currentPlan === "free" ? "pro" : currentPlan
+  const planLabel = plan === "pro" ? "Pro (R$8,90)" : "Business (R$15,90)"
+  if (!confirm(`Simular pagamento aprovado do plano ${planLabel} para este usuário?\n\nIsso vai:\n- Ativar o plano\n- Registrar nas logs de pagamento como PAGO`)) return
+  try {
+    const res = await fetch("/api/admin/simulate-payment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminToken}` },
+      body: JSON.stringify({ user_id: userId, plan })
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error)
+    alert(`✅ ${data.message}\nTransaction ID: ${data.transaction_id}`)
+    loadUsers()
+  } catch (err) {
+    alert("Erro: " + err.message)
+  }
+}
+
+// ── Alterar plano ─────────────────────────────────────────────────────────────
+async function setPlan(userId, plan) {
+  try {
+    const res = await fetch("/api/admin/set-plan", { method:"POST", headers:{"Content-Type":"application/json","Authorization":`Bearer ${adminToken}`}, body:JSON.stringify({ user_id:userId, plan }) })
+    if (!res.ok) throw new Error("Falha ao alterar plano")
+  } catch (err) { alert("Erro: " + err.message); loadUsers() }
+}
+
+// ── Bloquear ──────────────────────────────────────────────────────────────────
+async function toggleBlock(userId, block) {
+  if (!confirm(`${block?"Bloquear":"Desbloquear"} este usuário?`)) return
+  await fetch("/api/admin/block", { method:"POST", headers:{"Content-Type":"application/json","Authorization":`Bearer ${adminToken}`}, body:JSON.stringify({ user_id:userId, block }) })
+  loadUsers()
+}
+
+// ── Promover ──────────────────────────────────────────────────────────────────
+async function promoteById(userId, promote) {
+  if (!isFounder) return alert("Somente o fundador pode gerenciar admins")
+  if (!confirm(promote?"Promover a admin?":"Remover permissão de admin?")) return
+  const res = await fetch("/api/admin/promote", { method:"POST", headers:{"Content-Type":"application/json","Authorization":`Bearer ${adminToken}`}, body:JSON.stringify({ user_id:userId, promote }) })
+  if (res.ok) loadUsers(); else alert("Erro ao atualizar admin")
+}
+
+// ── Promover por email ────────────────────────────────────────────────────────
+document.getElementById("doPromote").onclick = async () => {
+  if (!isFounder) { alert("Somente o fundador pode gerenciar admins"); return }
+  const email = document.getElementById("promoteEmail").value.trim()
+  const msg   = document.getElementById("promoteMsg")
+  if (!email) { msg.textContent = "Informe o email"; msg.className = "form-msg error"; return }
+  try {
+    const res   = await fetch("/api/admin/users", { headers:{"Authorization":`Bearer ${adminToken}`} })
+    const users = await res.json()
+    const user  = users.find(u => u.email === email)
+    if (!user) throw new Error("Usuário não encontrado")
+    const res2 = await fetch("/api/admin/promote", { method:"POST", headers:{"Content-Type":"application/json","Authorization":`Bearer ${adminToken}`}, body:JSON.stringify({ user_id:user.id, promote:true }) })
+    if (!res2.ok) throw new Error("Erro ao promover")
+    msg.textContent = `${email} agora é admin!`; msg.className = "form-msg success"
+    document.getElementById("promoteEmail").value = ""
+    loadAdmins()
+  } catch (err) { msg.textContent = err.message; msg.className = "form-msg error" }
+}
+
+// ── Admins ────────────────────────────────────────────────────────────────────
+async function loadAdmins() {
+  const tbody = document.getElementById("adminsBody")
+  try {
+    const res   = await fetch("/api/admin/users", { headers:{"Authorization":`Bearer ${adminToken}`} })
+    const users = await res.json()
+    const admins = users.filter(u => u.is_admin)
+    if (!admins.length) { tbody.innerHTML = `<tr><td colspan="3" style="color:var(--text-dim);padding:20px">Nenhum admin.</td></tr>`; return }
+    tbody.innerHTML = admins.map(u => `
+      <tr>
+        <td>${esc(u.email)}</td>
+        <td>${esc(u.name) || "—"}</td>
+        <td style="font-size:12px;color:var(--text-dim)">${new Date(u.created_at).toLocaleDateString("pt-BR")}</td>
+      </tr>
+    `).join("")
+  } catch { tbody.innerHTML = `<tr><td colspan="3" style="color:#f87171">Erro.</td></tr>` }
+}
+
+// ── Análises ──────────────────────────────────────────────────────────────────
+async function loadAnalyses() {
+  const tbody = document.getElementById("analysesBody")
+  try {
+    const res  = await fetch("/api/admin/analyses", { headers:{"Authorization":`Bearer ${adminToken}`} })
+    const data = await res.json()
+    tbody.innerHTML = data.map(a => `
+      <tr>
+        <td style="color:var(--text-dim);font-size:12px">${a.id.slice(0,8)}…</td>
+        <td style="font-size:12px">${a.user_id.slice(0,8)}…</td>
+        <td>${new Date(a.created_at).toLocaleString("pt-BR")}</td>
+      </tr>
+    `).join("")
+  } catch { tbody.innerHTML = `<tr><td colspan="3" style="color:#f87171">Erro.</td></tr>` }
+}
+
+// ── Logs ──────────────────────────────────────────────────────────────────────
+async function loadLogs() {
+  const tbody = document.getElementById("logsBody")
+  tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-dim);padding:20px">Carregando…</td></tr>`
+  try {
+    const res  = await fetch("/api/admin/logs", { headers:{"Authorization":`Bearer ${adminToken}`} })
+    if (!res.ok) throw new Error("Erro " + res.status)
+    const data = await res.json()
+    const labels = {
+      register:"📝 Cadastro", login:"🔑 Login", login_google:"🔑 Google",
+      register_google:"📝 Google", analyze:"📊 Análise",
+      admin_block:"🚫 Bloqueio", admin_unblock:"✅ Desbloqueio", admin_set_plan:"🔄 Alt.Plano"
+    }
+    if (!data.length) { tbody.innerHTML = `<tr><td colspan="5" style="color:var(--text-dim);padding:20px">Nenhum log ainda.</td></tr>`; return }
+    tbody.innerHTML = data.map(l => `
+      <tr>
+        <td style="font-size:12px;color:var(--text-dim);white-space:nowrap">${new Date(l.created_at).toLocaleString("pt-BR")}</td>
+        <td style="font-size:12px">${esc(l.user_email || l.user_id?.slice(0,8)) || "—"}</td>
+        <td><span style="font-size:12px">${labels[l.action] || l.action}</span></td>
+        <td style="font-size:12px;font-family:monospace;color:var(--text-dim)">${esc(l.ip) || "—"}</td>
+        <td style="font-size:12px;color:var(--text-dim)">${esc(l.detail) || "—"}</td>
+      </tr>
+    `).join("")
+  } catch (err) { tbody.innerHTML = `<tr><td colspan="5" style="color:#f87171">Erro: ${err.message}</td></tr>` }
+}
+</script>
+</body>
+</html>

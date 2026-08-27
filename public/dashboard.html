@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Analyza — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/jpeg" href="logo-a.jpg">
+</head>
+<body class="dash-body">
+
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+
+<!-- TOP HEADER -->
+<header class="dash-header">
+  <div class="dash-header-logo">
+    <a href="index.html" class="logo" style="font-size:19px">
+      <img src="logo-full.png" class="logo-full-img" alt="Analyza">
+    </a>
+  </div>
+
+  <nav class="dash-header-nav">
+    <button class="dash-nav-btn active" data-view="analyze">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Analisar
+    </button>
+    <button class="dash-nav-btn" data-view="history">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Histórico
+    </button>
+  </nav>
+
+  <div class="dash-header-right">
+    <a href="index.html#pricing" id="dashUpgradeBtn" class="btn-gold" style="font-size:12px;display:none;padding:7px 14px">⚡ Upgrade</a>
+    <div class="avatar-wrap" id="dashAvatarWrap">
+      <button class="avatar-btn" id="dashAvatarBtn" aria-label="Conta">
+        <span class="avatar-initial" id="dashAvatarInitial">?</span>
+      </button>
+      <div class="avatar-dropdown" id="dashAvatarDropdown">
+        <div class="avatar-dd-header">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div class="avatar-btn" style="width:36px;height:36px;cursor:default;flex-shrink:0" id="dashDdAvatar">
+              <span class="avatar-initial" id="dashDdAvatarInitial">?</span>
+            </div>
+            <div>
+              <div class="avatar-dd-name" id="dashDdName">—</div>
+              <div class="avatar-dd-email" id="dashDdEmail">—</div>
+            </div>
+          </div>
+          <span class="avatar-dd-plan" id="dashDdPlan">Free</span>
+        </div>
+        <div class="avatar-dd-divider"></div>
+        <a href="dashboard.html" class="avatar-dd-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Dashboard
+        </a>
+        <a href="index.html#pricing" class="avatar-dd-item">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Ver planos
+        </a>
+        <div class="avatar-dd-divider"></div>
+        <button class="avatar-dd-item avatar-dd-logout" id="dashLogoutBtn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair da conta
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- LOGOUT MODAL -->
+<div class="logout-overlay" id="logoutOverlay">
+  <div class="logout-modal">
+    <div class="logout-modal-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </div>
+    <h3 class="logout-modal-title">Sair da conta?</h3>
+    <p class="logout-modal-desc">Você tem certeza que deseja sair? Será necessário fazer login novamente.</p>
+    <div class="logout-modal-actions">
+      <button class="logout-cancel" id="logoutCancel">Cancelar</button>
+      <button class="logout-confirm" id="logoutConfirm">Sim, sair</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE NAV BAR (visible only on mobile) -->
+<div class="dash-mobile-nav-bar" id="dashMobileNav">
+  <button class="dash-nav-btn active" data-view="analyze">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    Analisar
+  </button>
+  <button class="dash-nav-btn" data-view="history">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Histórico
+  </button>
+</div>
+
+<!-- MAIN -->
+<main class="dash-content">
+
+  <!-- VIEW: ANALYZE -->
+  <div id="view-analyze">
+    <div class="dash-greeting" id="dashGreeting">
+      <div>
+        <div class="dash-greeting-title">Olá, <span id="greetName">visitante</span> 👋</div>
+        <div class="dash-greeting-sub">Envie seu extrato e descubra para onde vai o seu dinheiro.</div>
+      </div>
+      <div class="dash-plan-chip" id="dashPlanChip"></div>
+    </div>
+
+    <div class="dash-glass-card">
+      <div class="dash-card-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Enviar extrato
+      </div>
+
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-icon">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+        </div>
+        <div class="dropzone-text">Clique ou arraste seu arquivo aqui</div>
+        <div class="dropzone-sub">CSV, TXT ou PDF — qualquer formato bancário brasileiro</div>
+      </div>
+      <input type="file" id="fileInput" accept=".csv,.txt,.pdf" hidden>
+
+      <div class="textarea-or-divider"><span>ou cole o texto</span></div>
+      <textarea id="textInput" placeholder="Cole aqui o conteúdo do extrato…"
+        style="width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border);
+               border-radius:12px;padding:14px;color:var(--text);font-family:var(--font-body);
+               font-size:13px;min-height:120px;resize:vertical;outline:none;
+               transition:border-color .2s,background .2s;box-sizing:border-box;display:block"
+        onfocus="this.style.borderColor='var(--gold)';this.style.background='rgba(201,168,76,.04)'"
+        onblur="this.style.borderColor='var(--border)';this.style.background='rgba(255,255,255,.03)'"></textarea>
+
+      <div class="analyze-actions">
+        <button class="btn-primary btn-analyze" id="analyzeBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Analisar com IA
+        </button>
+        <button class="btn-ghost" id="clearBtn">Limpar</button>
+      </div>
+
+      <div class="ai-disclaimer">
+        <span class="ai-disclaimer-icon">⚠️</span>
+        Analyza é uma IA e pode cometer erros. Verifique os resultados antes de tomar decisões financeiras.
+      </div>
+    </div>
+
+    <div id="analyzeMsg" style="margin-top:12px;font-size:13px;color:var(--text-dim)"></div>
+    <div id="resultArea" class="hidden"></div>
+  </div>
+
+  <!-- VIEW: HISTORY -->
+  <div id="view-history" class="hidden">
+    <div class="dash-greeting">
+      <div>
+        <div class="dash-greeting-title">Histórico</div>
+        <div class="dash-greeting-sub">Suas análises anteriores salvas</div>
+      </div>
+    </div>
+    <div class="dash-glass-card">
+      <div id="historyList" class="history-list">
+        <div style="color:var(--text-dim);font-size:14px;padding:20px 0">Carregando…</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="dashboard.js?v=2"></script>
+</body>
+</html>
