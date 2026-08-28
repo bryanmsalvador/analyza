@@ -218,6 +218,10 @@ function readFile(file) {
   reader.onload = (e) => {
     textInput.value = e.target.result
     dropzone.querySelector(".dropzone-text").textContent = `✓ ${file.name}`
+    // Oculta a caixa de texto para não exibir códigos binários confusos do PDF/arquivo
+    textInput.style.display = "none"
+    const divider = document.getElementById("textDivider")
+    if (divider) divider.style.display = "none"
   }
   reader.readAsText(file)
 }
@@ -230,6 +234,9 @@ const clearBtn   = document.getElementById("clearBtn")
 
 clearBtn.onclick = () => {
   textInput.value = ""
+  textInput.style.display = "block"
+  const divider = document.getElementById("textDivider")
+  if (divider) divider.style.display = "flex"
   dropzone.querySelector(".dropzone-text").textContent = "Clique ou arraste seu arquivo aqui"
   resultArea.innerHTML = ""
   resultArea.classList.add("hidden")
@@ -405,6 +412,15 @@ function renderResult(result, plan, previous) {
     alertsHtml = r.alertas.map((a) => `<div class="insight-item"><span>⚠️</span><span>${esc(a)}</span></div>`).join("")
   }
 
+  const isBusinessPlan = plan === "business"
+  const pdfButtonHtml = isBusinessPlan
+    ? `<button onclick="downloadAnalysisPDF()" class="no-print" style="background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;gap:6px">
+         📄 Baixar Relatório PDF
+       </button>`
+    : `<a href="index.html#pricing" class="no-print" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text-dim);padding:6px 12px;border-radius:8px;font-size:11px;text-decoration:none">
+         🔒 PDF (Exclusivo Business)
+       </a>`
+
   resultArea.innerHTML = `
     <div class="result-card" id="printableReport">
       <!-- PDF Branding Header (Logotipo Analyza no PDF) -->
@@ -421,9 +437,7 @@ function renderResult(result, plan, previous) {
         </div>
         <div style="text-align:right">
           ${r.resumo?.periodo ? `<div style="font-size:14px;color:var(--text-dim);margin-bottom:6px">${esc(r.resumo.periodo)}</div>` : ""}
-          <button onclick="downloadAnalysisPDF()" class="no-print" style="background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;gap:6px">
-            📄 Baixar Relatório PDF
-          </button>
+          ${pdfButtonHtml}
         </div>
       </div>
 

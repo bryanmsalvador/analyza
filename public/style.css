@@ -2368,36 +2368,92 @@ body {
 
 /* ── Print PDF Export Stylesheet ───────────────────────────────────────── */
 .pdf-branding-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
-  text-align: center;
+  display: none; /* Escondido na interface do site */
 }
 .pdf-branding-footer {
-  margin-top: 28px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-  text-align: center;
+  display: none; /* Escondido na interface do site */
 }
 
 @media print {
-  body { background: #fff !important; color: #000 !important; }
-  .dash-sidebar, .dash-nav, .chat-trigger-btn, .analyza-chat-window, .analyza-chat-trigger,
-  #chatTrigger, #sidebarToggle, button, .btn-primary, .btn-outline, .no-print { display: none !important; }
-  .dash-layout { grid-template-columns: 1fr !important; }
-  .dash-main { padding: 0 !important; }
-  .result-card {
-    background: #fff !important; color: #000 !important; border: 1px solid #ccc !important;
-    box-shadow: none !important; backdrop-filter: none !important; page-break-inside: avoid;
-    padding: 36px !important;
+  /* Oculta FORÇADAMENTE todos os blocos do Dashboard da folha de impressão */
+  header, nav, aside, .dash-header, .dash-sidebar, .dash-greeting, .dash-glass-card,
+  .dash-mobile-nav-bar, #dashMobileNav, #sidebarToggle, #logoutOverlay,
+  #dropzone, #textDivider, #textInput, #fileInput, .analyze-actions, .ai-disclaimer,
+  #analyzeMsg, .chat-trigger-btn, .analyza-chat-window, .analyza-chat-trigger,
+  #chatTrigger, .no-print, button {
+    display: none !important;
   }
-  .result-score { color: #000 !important; }
-  .stat-box { background: #f8f9fa !important; border: 1px solid #e9ecef !important; }
-  .stat-box-value { color: #000 !important; }
-  .pdf-branding-header { border-bottom: 1px solid #eee !important; margin-bottom: 24px !important; }
-  .pdf-branding-footer { border-top: 1px solid #eee !important; margin-top: 32px !important; color: #333 !important; }
+
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .dash-layout {
+    display: block !important;
+    min-height: auto !important;
+  }
+
+  .dash-main {
+    padding: 0 !important;
+  }
+
+  #resultArea {
+    display: block !important;
+  }
+
+  /* Exibe EXCLUSIVAMENTE o relatório impresso (#printableReport) */
+  #printableReport {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    padding: 20px 0 !important;
+    margin: 0 !important;
+  }
+
+  .pdf-branding-header {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 24px !important;
+    padding-bottom: 14px !important;
+    border-bottom: 2px solid #c9a84c !important;
+    text-align: center !important;
+  }
+  .pdf-branding-header img {
+    height: 48px !important;
+    width: auto !important;
+  }
+  .pdf-branding-header div {
+    color: #555555 !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+  }
+
+  .pdf-branding-footer {
+    display: block !important;
+    margin-top: 36px !important;
+    padding-top: 18px !important;
+    border-top: 1px solid #e2e8f0 !important;
+    text-align: center !important;
+    color: #475569 !important;
+  }
+
+  .result-score { color: #111111 !important; }
+  .result-score-label { color: #64748b !important; }
+  .stat-box { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
+  .stat-box-value { color: #0f172a !important; }
+  .stat-box-label { color: #64748b !important; }
+  .insight-item { background: #f8fafc !important; border: 1px solid #e2e8f0 !important; color: #1e293b !important; }
+  .cat-row { border-bottom: 1px solid #f1f5f9 !important; }
+  .cat-name { color: #0f172a !important; }
+  .cat-val { color: #0f172a !important; }
 }

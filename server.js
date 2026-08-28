@@ -477,12 +477,53 @@ app.post("/api/analyze", auth, async (req, res) => {
     const { data: extractData } = req.body
     if (!extractData) return res.status(400).json({ error: "Nenhum dado enviado" })
 
+    // ── ⚡ SHA-256 HASH CACHING (0 TOKENS SE REENVIAR O MESMO EXTRATO) ──────
+    const extractHash = crypto.createHash("sha256").update(extractData.trim()).digest("hex")
+
+    // Verifica se este usuário já analisou este EXATO MESMO extrato anteriormente
+    const { data: cachedList } = await supabase
+      .from("analyses")
+      .select("data")
+      .eq("user_id", req.user.id)
+      .order("created_at", { ascending: false })
+      .limit(10)
+
+    if (cachedList?.length) {
+      for (const item of cachedList) {
+        if (item.data) {
+          try {
+            const parsedObj = JSON.parse(item.data.replace(/```json|```/g, "").trim())
+            if (parsedObj._extractHash === extractHash) {
+              // ⚡ EXTRATO REENVIADO DETECTADO! Retorna resultado do cache sem gastar NENHUM token!
+              return res.json({
+                result: parsedObj,
+                cached: true,
+                plan: userData.plan
+              })
+            }
+          } catch {}
+        }
+      }
+    }
+
     const isBusiness = userData.plan === "business"
     const modelName  = "gemini-3.6-flash"
-    const model  = genAI.getGenerativeModel({ model: modelName })
+    // Temperatura 0 = Resposta 100% matemática, exata e sem invenções/alucinações
+    const model  = genAI.getGenerativeModel({
+      model: modelName,
+      generationConfig: { temperature: 0, topP: 1 }
+    })
     const prompt = isBusiness ? buildPromptBusiness(extractData) : buildPromptFree(extractData)
     const result = await model.generateContent(prompt)
     const text   = result.response.text()
+
+    let parsed
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g, "").trim())
+      parsed._extractHash = extractHash
+    } catch {
+      parsed = { raw: text, _extractHash: extractHash }
+    }
 
     // Busca última análise anterior para comparação Mês a Mês
     let previousResult = null
@@ -500,17 +541,13 @@ app.post("/api/analyze", auth, async (req, res) => {
     } catch {}
 
     await supabase.from("analyses").insert([{
-      user_id: req.user.id, data: text, created_at: new Date().toISOString()
+      user_id: req.user.id, data: JSON.stringify(parsed), created_at: new Date().toISOString()
     }])
     await supabase.from("users")
       .update({ analyses_count: (userData.analyses_count || 0) + 1 })
       .eq("id", req.user.id)
 
     await log(req.user.id, isBusiness ? "analyze_business" : "analyze", req.clientIp)
-
-    let parsed
-    try { parsed = JSON.parse(text.replace(/```json|```/g, "").trim()) }
-    catch { parsed = { raw: text } }
 
     res.json({ result: parsed, previous: previousResult, plan: userData.plan })
   } catch (err) {
@@ -566,7 +603,7 @@ INFORMAÇÕES SOBRE O ANALYZA:
 - PLANOS:
   1. Free: R$ 0/mês — 10 análises/mês, categorização automática e score.
   2. Pro: R$ 8,90/mês — Análises ilimitadas, histórico completo e alertas.
-  3. Business: R$ 15,90/mês — Diagnóstico consultivo completo, detecção de streamings/assinaturas (essencial vs dispensável), médias mensais, gráficos de tendência e recomendações de corte de custo com valores exatos.
+  3. Business: R$ 15,90/mês — Exportação de Relatórios Oficiais em PDF (com Logotipo), Diagnóstico consultivo completo com IA avançada, simulador de metas de economia, dica de rendimento 100% CDI de saldo positivo, gráficos de tendência e recomendações de corte de custo com valores exatos.
 - PAGAMENTOS: PIX automático e Cartão de Crédito recorrente, cancele quando quiser.
 
 REGRAS:

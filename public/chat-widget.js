@@ -22,8 +22,8 @@
       answer: "O **Analyza** é simples! 🚀\n1. Você envia seu extrato (CSV, PDF ou TXT) ou cola o texto.\n2. Nossa IA analisa e categoriza todas as transações.\n3. Você recebe o **Score de Saúde Financeira**, resumo de entradas/saídas e dicas de economia!"
     },
     {
-      keywords: ["plano", "planos", "preco", "preço", "quanto custa", "valor", "pro", "business", "vantagens", "beneficios", "benefícios"],
-      answer: "Temos 3 opções no **Analyza**:\n• **Free** (R$ 0): 10 análises mensais e Score de Saúde Financeira.\n• **Pro** (R$ 8,90/mês): Análises ilimitadas, alertas e histórico ilimitado.\n• **Business** (R$ 15,90/mês): Diagnóstico consultivo completo com IA avançada, gráficos, detecção de streamings e recomendações de corte de custo."
+      keywords: ["plano", "planos", "preco", "preço", "quanto custa", "valor", "pro", "business", "vantagens", "beneficios", "benefícios", "diferenca", "diferença"],
+      answer: "Conheça os benefícios de cada plano do **Analyza**:\n\n• **Free** (R$ 0/mês):\n  - 10 análises financeiras mensais\n  - Categorização automática de gastos\n  - Score de Saúde Financeira (0-100)\n\n• **Pro** (R$ 8,90/mês):\n  - **Análises ilimitadas**\n  - Histórico completo de análises\n  - Alertas de riscos e gastos excessivos\n\n• **Business** (R$ 15,90/mês):\n  - **📄 Exportação de Relatórios Oficiais em PDF (Com Logotipo)**\n  - **🎯 Simulador de Metas & Economia Acumulada**\n  - **📈 Dica de Rendimento 100% CDI de Saldo Positivo**\n  - **📊 Comparativo Mês a Mês**\n  - Diagnóstico consultivo completo com IA avançada"
     },
     {
       keywords: ["seguranca", "segurança", "seguro", "dados bancarios", "dados bancários", "privacidade", "armazenam", "salvo"],
