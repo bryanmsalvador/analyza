@@ -176,6 +176,10 @@
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
         Logs
       </button>
+      <button class="sidebar-link" data-view="security">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Segurança / Infrações
+      </button>
     </nav>
 
     <div style="flex:1"></div>
@@ -333,6 +337,31 @@
       </div>
     </div>
 
+    <!-- ── SEGURANÇA / INFRAÇÕES ─────────────────────────────────────────────── -->
+    <div id="view-security" class="hidden">
+      <div class="dash-title" style="color:#ef4444;display:flex;align-items:center;gap:10px">
+        🛡️ Alertas de Segurança & Tentativas de Hack
+      </div>
+      <div class="dash-subtitle">Registro de tentativas de extração de chaves e jailbreak no Chatbot com Auto-Ban</div>
+      <div style="overflow-x:auto;width:100%">
+        <table class="admin-table" style="width:100%;min-width:700px">
+          <thead>
+            <tr>
+              <th>Data/Hora</th>
+              <th>Usuário Infrator</th>
+              <th>Ação</th>
+              <th>IP do Infrator</th>
+              <th>Mensagem de Ataque</th>
+              <th>Status / Ação</th>
+            </tr>
+          </thead>
+          <tbody id="securityBody">
+            <tr><td colspan="6" style="color:var(--text-dim);padding:20px">Carregando alertas de segurança…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- ── ADMINS ────────────────────────────────────────────────────────────── -->
     <div id="view-admins" class="hidden">
       <div class="dash-title">Administradores</div>
@@ -426,7 +455,7 @@ if (adminToken) showPanel()
 document.getElementById("logoutBtn").onclick = () => { sessionStorage.removeItem("analyza_admin_token"); location.reload() }
 
 // ── Navegação ─────────────────────────────────────────────────────────────────
-const views = ["users","payments","analyses","admins","logs"]
+const views = ["users","payments","analyses","admins","logs","security"]
 document.querySelectorAll(".sidebar-link[data-view]").forEach(btn => {
   btn.onclick = () => {
     document.querySelectorAll(".sidebar-link").forEach(b => b.classList.remove("active"))
@@ -437,6 +466,7 @@ document.querySelectorAll(".sidebar-link[data-view]").forEach(btn => {
     if (v === "analyses") loadAnalyses()
     if (v === "admins")   loadAdmins()
     if (v === "logs")     loadLogs()
+    if (v === "security") loadSecurityAlerts()
     closeSidebar()
   }
 })
@@ -681,6 +711,56 @@ async function loadAnalyses() {
       </tr>
     `).join("")
   } catch { tbody.innerHTML = `<tr><td colspan="3" style="color:#f87171">Erro.</td></tr>` }
+}
+
+// ── Alertas de Segurança & Chatbot Jailbreak ───────────────────────────────
+async function loadSecurityAlerts() {
+  const tbody = document.getElementById("securityBody")
+  if (!tbody) return
+  tbody.innerHTML = `<tr><td colspan="6" style="color:var(--text-dim);padding:20px">Carregando alertas de segurança…</td></tr>`
+  try {
+    const res = await fetch("/api/admin/security-alerts", { headers: { "Authorization": `Bearer ${adminToken}` } })
+    const data = await res.json()
+    if (!data.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="color:#34d399;padding:20px">✓ Nenhuma tentativa de violação registrada. Todos os sistemas seguros!</td></tr>`
+      return
+    }
+    tbody.innerHTML = data.map(l => {
+      const isAutoBan = l.action === "auto_ban_chatbot_jailbreak"
+      const statusBadge = l.is_blocked || isAutoBan
+        ? `<span class="pay-status failed">🔴 BLOQUEADO (Auto-Ban)</span>`
+        : `<span class="pay-status pending">⚠️ Sinalizado</span>`
+
+      const actionBtn = l.user_id
+        ? `<button class="btn-action ${l.is_blocked ? "btn-unblock" : "btn-block"}" onclick="blockUser('${l.user_id}', ${!l.is_blocked})">
+            ${l.is_blocked ? "Desbloquear Conta" : "Banir Conta"}
+           </button>`
+        : `<span style="font-size:11px;color:var(--text-dim)">Visitante sem conta</span>`
+
+      const msgSnippet = l.detail?.offending_message ? esc(l.detail.offending_message) : "Tentativa de extração de chave"
+
+      return `
+        <tr>
+          <td style="font-size:12px;white-space:nowrap;color:var(--text-dim)">${new Date(l.created_at).toLocaleString("pt-BR")}</td>
+          <td>
+            <div style="font-weight:500;color:var(--text)">${esc(l.user_email)}</div>
+            ${l.user_name !== "N/A" ? `<div style="font-size:11px;color:var(--text-dim)">${esc(l.user_name)}</div>` : ""}
+          </td>
+          <td><span style="color:#f87171;font-weight:600;font-size:12px">${l.action === "chatbot_jailbreak_attempt" ? "Jailbreak Chatbot" : "Auto-Ban Chatbot"}</span></td>
+          <td style="font-family:monospace;font-size:12px;color:var(--gold)">${esc(l.ip)}</td>
+          <td style="max-width:280px;font-size:12px;color:#f87171;background:rgba(248,113,113,.05);padding:6px 10px;border-radius:6px;word-break:break-word">${msgSnippet}</td>
+          <td>
+            <div style="display:flex;flex-direction:column;gap:6px">
+              ${statusBadge}
+              ${actionBtn}
+            </div>
+          </td>
+        </tr>
+      `
+    }).join("")
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="6" style="color:#f87171;padding:20px">Erro ao carregar alertas de segurança.</td></tr>`
+  }
 }
 
 // ── Logs ──────────────────────────────────────────────────────────────────────

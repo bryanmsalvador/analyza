@@ -15,6 +15,43 @@
       .replace(/'/g, "&#039;")
   }
 
+  // ── BASE DE RESPOSTAS PRONTAS (0ms & 0 Tokens) ─────────────────────────
+  const FAQ_DATABASE = [
+    {
+      keywords: ["como funciona", "como usar", "funciona o analyza", "passo a passo"],
+      answer: "O **Analyza** é simples! 🚀\n1. Você envia seu extrato (CSV, PDF ou TXT) ou cola o texto.\n2. Nossa IA analisa e categoriza todas as transações.\n3. Você recebe o **Score de Saúde Financeira**, resumo de entradas/saídas e dicas de economia!"
+    },
+    {
+      keywords: ["plano", "planos", "preco", "preço", "quanto custa", "valor", "pro", "business", "vantagens", "beneficios", "benefícios"],
+      answer: "Temos 3 opções no **Analyza**:\n• **Free** (R$ 0): 10 análises mensais e Score de Saúde Financeira.\n• **Pro** (R$ 8,90/mês): Análises ilimitadas, alertas e histórico ilimitado.\n• **Business** (R$ 15,90/mês): Diagnóstico consultivo completo com IA avançada, gráficos, detecção de streamings e recomendações de corte de custo."
+    },
+    {
+      keywords: ["seguranca", "segurança", "seguro", "dados bancarios", "dados bancários", "privacidade", "armazenam", "salvo"],
+      answer: "Seus dados estão 100% seguros! 🔒\nO Analyza processa seu extrato na hora e descarta as informações em seguida. **NUNCA** armazenamos senhas bancárias ou dados sigilosos."
+    },
+    {
+      keywords: ["formato", "formatos", "banco", "bancos", "pdf", "csv", "txt", "nubank", "itau", "bradesco", "c6", "inter", "caixa", "santander"],
+      answer: "Aceitamos extratos de qualquer banco brasileiro (Nubank, Itaú, Bradesco, C6, Inter, Caixa, Santander, etc.) nos formatos **CSV, PDF, TXT** ou colando o texto diretamente!"
+    },
+    {
+      keywords: ["pix", "cartao", "cartão", "pagamento", "cancelar", "assinatura"],
+      answer: "Aceitamos pagamentos via **PIX automático** e **Cartão de Crédito**. Você pode cancelar sua assinatura a qualquer momento sem fidelidade!"
+    }
+  ]
+
+  function getLocalFaqAnswer(text) {
+    const clean = text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    for (const item of FAQ_DATABASE) {
+      for (const kw of item.keywords) {
+        const cleanKw = kw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        if (clean.includes(cleanKw)) {
+          return item.answer
+        }
+      }
+    }
+    return null
+  }
+
   // ── Chime Sound Synthesizer (Web Audio API - No external audio file needed!) ──
   function playChimeSound() {
     try {
@@ -83,11 +120,23 @@
   trigger.onclick = () => toggleChat()
   close.onclick   = () => toggleChat(false)
 
+  function formatMarkdown(text) {
+    if (!text) return ""
+    let html = esc(text)
+    // Convert **bold** to <strong>bold</strong>
+    html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    // Convert *italic* to <em>italic</em>
+    html = html.replace(/\*(.*?)\*/g, "<em>$1</em>")
+    // Convert newlines to <br>
+    html = html.replace(/\n/g, "<br>")
+    return html
+  }
+
   // Add Message to Chat
   function addMessage(text, sender = "bot") {
     const div = document.createElement("div")
     div.className = `chat-bubble ${sender}`
-    div.innerHTML = esc(text).replace(/\n/g, "<br>")
+    div.innerHTML = formatMarkdown(text)
     msgs.appendChild(div)
     msgs.scrollTop = msgs.scrollHeight
 
@@ -117,7 +166,16 @@
     if (!customText) input.value = ""
     addMessage(text, "user")
 
-    // Show Typing Indicator
+    // 1. Tenta responder instantaneamente via FAQ local (0ms, 0 Tokens)
+    const localAnswer = getLocalFaqAnswer(text)
+    if (localAnswer) {
+      setTimeout(() => {
+        addMessage(localAnswer, "bot")
+      }, 200)
+      return
+    }
+
+    // 2. Se não estiver no FAQ, consulta a IA Gemini (Backup)
     const typing = document.createElement("div")
     typing.className = "chat-bubble bot"
     typing.id = "chatTyping"

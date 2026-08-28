@@ -2365,3 +2365,39 @@ body {
   .analyza-chat-window { right: 16px; bottom: 84px; width: calc(100vw - 32px); height: 440px; }
   .analyza-chat-trigger { right: 16px; bottom: 16px; width: 52px; height: 52px; }
 }
+
+/* ── Print PDF Export Stylesheet ───────────────────────────────────────── */
+.pdf-branding-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+}
+.pdf-branding-footer {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+@media print {
+  body { background: #fff !important; color: #000 !important; }
+  .dash-sidebar, .dash-nav, .chat-trigger-btn, .analyza-chat-window, .analyza-chat-trigger,
+  #chatTrigger, #sidebarToggle, button, .btn-primary, .btn-outline, .no-print { display: none !important; }
+  .dash-layout { grid-template-columns: 1fr !important; }
+  .dash-main { padding: 0 !important; }
+  .result-card {
+    background: #fff !important; color: #000 !important; border: 1px solid #ccc !important;
+    box-shadow: none !important; backdrop-filter: none !important; page-break-inside: avoid;
+    padding: 36px !important;
+  }
+  .result-score { color: #000 !important; }
+  .stat-box { background: #f8f9fa !important; border: 1px solid #e9ecef !important; }
+  .stat-box-value { color: #000 !important; }
+  .pdf-branding-header { border-bottom: 1px solid #eee !important; margin-bottom: 24px !important; }
+  .pdf-branding-footer { border-top: 1px solid #eee !important; margin-top: 32px !important; color: #333 !important; }
+}

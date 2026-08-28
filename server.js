@@ -484,6 +484,21 @@ app.post("/api/analyze", auth, async (req, res) => {
     const result = await model.generateContent(prompt)
     const text   = result.response.text()
 
+    // Busca última análise anterior para comparação Mês a Mês
+    let previousResult = null
+    try {
+      const { data: prevList } = await supabase
+        .from("analyses")
+        .select("data")
+        .eq("user_id", req.user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+
+      if (prevList?.[0]?.data) {
+        previousResult = JSON.parse(prevList[0].data.replace(/```json|```/g, "").trim())
+      }
+    } catch {}
+
     await supabase.from("analyses").insert([{
       user_id: req.user.id, data: text, created_at: new Date().toISOString()
     }])
@@ -497,7 +512,7 @@ app.post("/api/analyze", auth, async (req, res) => {
     try { parsed = JSON.parse(text.replace(/```json|```/g, "").trim()) }
     catch { parsed = { raw: text } }
 
-    res.json({ result: parsed, plan: userData.plan })
+    res.json({ result: parsed, previous: previousResult, plan: userData.plan })
   } catch (err) {
     console.error("analyze:", err.message)
     res.status(500).json({ error: "Erro ao analisar: " + err.message })
@@ -509,6 +524,36 @@ app.post("/api/chat-support", async (req, res) => {
   try {
     const { message, history } = req.body
     if (!message) return res.status(400).json({ error: "Mensagem vazia" })
+
+    // ── 🛡️ DETECTOR DE ATAQUES & TENTATIVAS DE EXTRAÇÃO DE CHAVES / JAILBREAK ──
+    const attackRegex = /(api[_\-\s]?key|gemini[_\-\s]?key|supabase[_\-\s]?key|jwt[_\-\s]?secret|process\.env|system\s+prompt|ignore\s+previous\s+instructions|revel(e|ar)\s+chave|mostr(e|ar)\s+chave|revel(e|ar)\s+prompt|admin\s+token|eval\(|drop\s+table|select\s+\*\s+from|bypass)/i
+
+    if (attackRegex.test(message)) {
+      let userId = null
+      try {
+        const token = req.cookies?.analyza_token
+        if (token) {
+          const decoded = jwt.verify(token, process.env.JWT_SECRET || "analyza_secret_dev")
+          userId = decoded.id
+        }
+      } catch {}
+
+      // Registra o log de infração no banco
+      await log(userId, "chatbot_jailbreak_attempt", req.clientIp, {
+        offending_message: message.slice(0, 300),
+        detected_at: new Date().toISOString()
+      })
+
+      // Se o infror estiver logado, bloqueia a conta automaticamente (Auto-Ban)
+      if (userId) {
+        await supabase.from("users").update({ is_blocked: true }).eq("id", userId)
+        await log(userId, "auto_ban_chatbot_jailbreak", req.clientIp)
+      }
+
+      return res.json({
+        reply: "⚠️ **Alerta de Segurança:** Esta mensagem violou os termos de uso e segurança da plataforma. A tentativa foi registrada e enviada ao painel do administrador."
+      })
+    }
 
     const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" })
 
@@ -1146,6 +1191,34 @@ app.get("/api/admin/logs", adminAuth, async (req, res) => {
     res.json(result)
   } catch (err) {
     res.status(500).json({ error: "Erro ao buscar logs" })
+  }
+})
+
+// Alertas de Segurança e Tentativas de Jailbreak / Hack no Chatbot
+app.get("/api/admin/security-alerts", adminAuth, async (req, res) => {
+  try {
+    const { data: logs } = await supabase.from("activity_logs")
+      .select("id, user_id, action, ip, detail, created_at")
+      .in("action", ["chatbot_jailbreak_attempt", "auto_ban_chatbot_jailbreak"])
+      .order("created_at", { ascending: false })
+      .limit(100)
+
+    if (!logs?.length) return res.json([])
+
+    const userIds = [...new Set(logs.map(l => l.user_id).filter(Boolean))]
+    const { data: users } = await supabase
+      .from("users").select("id, email, name, is_blocked").in("id", userIds)
+    const userMap = Object.fromEntries((users || []).map(u => [u.id, u]))
+
+    const result = logs.map(l => ({
+      ...l,
+      user_email: userMap[l.user_id]?.email || "Visitante Anônimo",
+      user_name:  userMap[l.user_id]?.name  || "N/A",
+      is_blocked: userMap[l.user_id]?.is_blocked || false
+    }))
+    res.json(result)
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao buscar alertas de segurança" })
   }
 })
 

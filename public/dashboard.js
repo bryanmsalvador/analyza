@@ -276,7 +276,7 @@ analyzeBtn.onclick = async () => {
     }
 
     analyzeMsg.textContent = ""
-    renderResult(json.result, json.plan)
+    renderResult(json.result, json.plan, json.previous)
   } catch (err) {
     analyzeMsg.style.color = "#f87171"
     analyzeMsg.textContent = err.message
@@ -291,7 +291,20 @@ function fmt(val) {
   return val.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
 }
 
-function renderResult(result, plan) {
+function downloadAnalysisPDF() {
+  window.print()
+}
+
+window.selectGoal = function(goalName, annualSavings, targetVal) {
+  const pct = Math.min(Math.round((annualSavings / targetVal) * 100), 100)
+  const months = Math.ceil(targetVal / (annualSavings / 12))
+  const msg = document.getElementById("goalResultMsg")
+  if (msg) {
+    msg.innerHTML = `🎯 Em 12 meses cortando gastos dispensáveis, você cobre <strong style="color:var(--gold)">${pct}%</strong> da sua meta de <strong>${goalName}</strong>! Ou atinge a meta completa em apenas <strong>${months} meses</strong>!`
+  }
+}
+
+function renderResult(result, plan, previous) {
   if (!result || result.raw) {
     resultArea.innerHTML = `<div class="result-card"><pre style="font-size:12px;color:var(--text-dim);white-space:pre-wrap">${result?.raw || JSON.stringify(result, null, 2)}</pre></div>`
     resultArea.classList.remove("hidden")
@@ -300,6 +313,71 @@ function renderResult(result, plan) {
 
   const r = result
   const score = r.score_saude_financeira ?? "—"
+
+  // 1. Comparação Mês a Mês
+  let comparisonHtml = ""
+  if (previous?.resumo?.total_saidas && r.resumo?.total_saidas) {
+    const diffSaidas = r.resumo.total_saidas - previous.resumo.total_saidas
+    const pctSaidas = Math.round((diffSaidas / previous.resumo.total_saidas) * 100)
+    const isGood = pctSaidas <= 0
+    const color = isGood ? "#34d399" : "#f87171"
+    const icon = isGood ? "🎉" : "⚠️"
+    const text = isGood
+      ? `Suas saídas caíram ${Math.abs(pctSaidas)}% em relação à análise anterior!`
+      : `Suas saídas aumentaram ${Math.abs(pctSaidas)}% em relação à análise anterior.`
+    
+    comparisonHtml = `
+      <div style="margin-top:14px;padding:10px 14px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid ${color}30;display:flex;align-items:center;gap:10px;font-size:13px">
+        <span>${icon}</span>
+        <span style="color:${color};font-weight:500">${text}</span>
+      </div>
+    `
+  }
+
+  // 2. Recomendador de Rendimento (100% CDI se saldo > 0)
+  let yieldHtml = ""
+  if (r.resumo?.saldo > 0) {
+    const saldo = r.resumo.saldo
+    const rendimentoAno = (saldo * 0.105).toFixed(2)
+    yieldHtml = `
+      <div style="margin-top:16px;padding:14px 18px;border-radius:14px;background:linear-gradient(135deg,rgba(201,168,76,.1),rgba(124,58,237,.1));border:1px solid rgba(201,168,76,.3);display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:8px;color:var(--gold);font-weight:700;font-size:13px">
+          <span>📈 Dica de Rendimento</span>
+          <span style="background:rgba(201,168,76,.2);padding:2px 8px;border-radius:20px;font-size:10px">100% do CDI</span>
+        </div>
+        <div style="font-size:13px;color:var(--text-dim);line-height:1.6">
+          Com seu saldo positivo de <strong style="color:var(--text)">${fmt(saldo)}</strong> parado na conta corrente você ganha R$ 0,00. Aplicado em 100% do CDI, esse valor rende aproximadamente <strong style="color:#34d399">${fmt(Number(rendimentoAno))} em 1 ano</strong> com liquidez diária!
+        </div>
+      </div>
+    `
+  }
+
+  // 3. Simulador de Economia & Metas
+  let goalSimulatorHtml = ""
+  let potSavingsMonthly = 0
+  if (r.assinaturas_detectadas?.length) {
+    potSavingsMonthly = r.assinaturas_detectadas.filter(s => s.essencial === false).reduce((a, b) => a + (b.valor || 0), 0)
+  }
+  if (!potSavingsMonthly && r.recomendacoes_corte?.length) {
+    potSavingsMonthly = 150
+  }
+  if (potSavingsMonthly > 0) {
+    const potSavingsAnnual = potSavingsMonthly * 12
+    goalSimulatorHtml = `
+      <div style="margin-top:20px;padding:16px 20px;border-radius:16px;background:rgba(22,22,32,.8);border:1px solid var(--border);backdrop-filter:blur(12px)">
+        <div style="font-size:13px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">🎯 Simulador de Economia & Metas</div>
+        <div style="font-size:13px;color:var(--text-dim);margin-bottom:12px">
+          Cortando os gastos dispensáveis identificados, você acumula até <strong style="color:#34d399;font-size:15px">${fmt(potSavingsAnnual)} em 1 ano</strong>!
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="chat-chip-btn" onclick="selectGoal('✈️ Viagem de Férias', ${potSavingsAnnual}, 3000)">✈️ Viagem (R$ 3.000)</button>
+          <button class="chat-chip-btn" onclick="selectGoal('🚗 Reserva / Carro', ${potSavingsAnnual}, 5000)">🚗 Reserva (R$ 5.000)</button>
+          <button class="chat-chip-btn" onclick="selectGoal('📱 Smartphone', ${potSavingsAnnual}, 2500)">📱 Novo Celular (R$ 2.500)</button>
+        </div>
+        <div id="goalResultMsg" style="margin-top:10px;font-size:12px;color:var(--text);font-style:italic"></div>
+      </div>
+    `
+  }
 
   let categoriesHtml = ""
   if (r.categorias?.length) {
@@ -328,15 +406,28 @@ function renderResult(result, plan) {
   }
 
   resultArea.innerHTML = `
-    <div class="result-card">
+    <div class="result-card" id="printableReport">
+      <!-- PDF Branding Header (Logotipo Analyza no PDF) -->
+      <div class="pdf-branding-header">
+        <img src="logo-full.png" alt="Analyza" style="height:36px;width:auto;object-fit:contain">
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Relatório de Saúde Financeira</div>
+      </div>
+
       <div class="result-header">
         <div>
           <div style="font-size:13px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Score Financeiro</div>
           <div class="result-score">${score}</div>
           <div class="result-score-label">de 100</div>
         </div>
-        ${r.resumo?.periodo ? `<div style="font-size:14px;color:var(--text-dim)">${esc(r.resumo.periodo)}</div>` : ""}
+        <div style="text-align:right">
+          ${r.resumo?.periodo ? `<div style="font-size:14px;color:var(--text-dim);margin-bottom:6px">${esc(r.resumo.periodo)}</div>` : ""}
+          <button onclick="downloadAnalysisPDF()" class="no-print" style="background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.3);color:var(--gold);padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);display:inline-flex;align-items:center;gap:6px">
+            📄 Baixar Relatório PDF
+          </button>
+        </div>
       </div>
+
+      ${comparisonHtml}
 
       ${r.resumo ? `
       <div class="result-stats">
@@ -363,8 +454,11 @@ function renderResult(result, plan) {
         </div>` : ""}
       </div>` : ""}
 
+      ${yieldHtml}
+      ${goalSimulatorHtml}
+
       ${categoriesHtml ? `
-      <div style="margin-bottom:20px">
+      <div style="margin-top:20px;margin-bottom:20px">
         <h4 style="font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:14px">Categorias</h4>
         ${categoriesHtml}
       </div>` : ""}
@@ -380,6 +474,12 @@ function renderResult(result, plan) {
         <h4>Alertas</h4>
         ${alertsHtml}
       </div>` : ""}
+
+      <!-- PDF Branding Footer (Rodapé no PDF com URL) -->
+      <div class="pdf-branding-footer">
+        <div style="font-size:11px;color:var(--text-dim)">Diagnóstico emitido com Inteligência Artificial pela plataforma <strong>Analyza</strong></div>
+        <div style="font-size:12px;font-weight:700;color:var(--gold);margin-top:4px">analyzasite.vercel.app</div>
+      </div>
     </div>
   `
   // ── Business extras ────────────────────────────────────────────────────────
