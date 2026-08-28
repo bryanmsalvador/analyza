@@ -493,6 +493,15 @@ function showLogoutConfirm(onConfirm) {
       if (heroNote) heroNote.textContent = "Bem-vindo de volta!"
       loadAvatarDropdown()
       startBlockCheck()
+
+      // Se havia um plano pendente selecionado antes de logar/registrar
+      const pendingPlan = sessionStorage.getItem("pending_plan")
+      if (pendingPlan) {
+        sessionStorage.removeItem("pending_plan")
+        if (typeof openCheckout === "function") {
+          setTimeout(() => openCheckout(pendingPlan), 300)
+        }
+      }
     }
   } catch {}
 })()
