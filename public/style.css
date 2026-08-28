@@ -2362,8 +2362,12 @@ body {
 .chat-send-btn:hover { transform: scale(1.05); }
 
 @media (max-width: 480px) {
-  .analyza-chat-window { right: 16px; bottom: 84px; width: calc(100vw - 32px); height: 440px; }
+  .analyza-chat-window { right: 12px; bottom: 80px; width: calc(100vw - 24px); height: 440px; max-height: calc(100vh - 100px); }
   .analyza-chat-trigger { right: 16px; bottom: 16px; width: 52px; height: 52px; }
+  .result-header { flex-direction: column !important; gap: 12px !important; align-items: flex-start !important; }
+  .result-header > div:last-child { text-align: left !important; width: 100% !important; }
+  .result-card { padding: 20px 16px !important; border-radius: 16px !important; }
+  .stat-box { padding: 14px 16px !important; }
 }
 
 /* ── Print PDF Export Stylesheet ───────────────────────────────────────── */

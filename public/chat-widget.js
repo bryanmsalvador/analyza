@@ -35,7 +35,7 @@
     },
     {
       keywords: ["pix", "cartao", "cartão", "pagamento", "cancelar", "assinatura"],
-      answer: "Aceitamos pagamentos via **PIX automático** e **Cartão de Crédito**. Você pode cancelar sua assinatura a qualquer momento sem fidelidade!"
+      answer: "Aceitamos pagamentos **100% via PIX automático** ⚡. É simples, instantâneo e sem necessidade de cartão de crédito! Você pode cancelar sua assinatura a qualquer momento."
     }
   ]
 

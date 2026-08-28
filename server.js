@@ -604,7 +604,7 @@ INFORMAÇÕES SOBRE O ANALYZA:
   1. Free: R$ 0/mês — 10 análises/mês, categorização automática e score.
   2. Pro: R$ 8,90/mês — Análises ilimitadas, histórico completo e alertas.
   3. Business: R$ 15,90/mês — Exportação de Relatórios Oficiais em PDF (com Logotipo), Diagnóstico consultivo completo com IA avançada, simulador de metas de economia, dica de rendimento 100% CDI de saldo positivo, gráficos de tendência e recomendações de corte de custo com valores exatos.
-- PAGAMENTOS: PIX automático e Cartão de Crédito recorrente, cancele quando quiser.
+- PAGAMENTOS: 100% via PIX automático instantâneo, sem necessidade de cartão de crédito, cancele quando quiser.
 
 REGRAS:
 - Responda em português brasileiro de forma simpática, curta e objetiva (máximo 3 a 4 frases).

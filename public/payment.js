@@ -119,30 +119,18 @@ function openCheckout(plan) {
         </div>
       </div>
 
-      <!-- DIREITO: tabs PIX / Cartão -->
+      <!-- DIREITO: Exclusivo PIX -->
       <div class="co-right">
         <button class="co-close" id="coClose">✕</button>
 
-        <!-- Tabs -->
-        <div class="co-payment-tabs">
-          <button class="co-tab active" data-tab="pix">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            PIX
-          </button>
-          <button class="co-tab" data-tab="card">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-            Cartão
-          </button>
-        </div>
-
-        <!-- Painel PIX -->
-        <div class="co-tab-panel" id="panelPix">
+        <!-- Painel PIX Automático (Exclusivo) -->
+        <div class="co-tab-panel" id="panelPix" style="display:block">
           <div id="coStep1Pix">
-            <div class="co-right-title">Pagar com PIX</div>
+            <div class="co-right-title">Pagar 100% via PIX Automático ⚡</div>
             <div class="co-summary">
               <div class="co-summary-row"><span>${info.nome}</span><span>${info.preco}/mês</span></div>
               <div class="co-summary-row" style="color:var(--text-dim);font-size:12px">
-                <span>Renovação mensal automática</span><span>Cancele quando quiser</span>
+                <span>Pagamento via PIX</span><span>Cancele quando quiser</span>
               </div>
               <div class="co-summary-divider"></div>
               <div class="co-summary-row co-total">
@@ -153,79 +141,17 @@ function openCheckout(plan) {
             <button class="co-pay-btn" id="coPayPixBtn" style="background:linear-gradient(135deg,${info.color},${info.color}cc)">
               Gerar QR Code PIX →
             </button>
-            <div class="co-badges"><span>🔒 SSL</span><span>⚡ PIX Instantâneo</span><span>✅ Ativação imediata</span></div>
+            <div class="co-badges"><span>🔒 SSL 256-bit</span><span>⚡ PIX Instantâneo</span><span>✅ Ativação Imediata</span></div>
             <p class="co-terms-note">Ao prosseguir você concorda com os <a href="termos.html" target="_blank">Termos de Uso</a> e <a href="privacidade.html" target="_blank">Privacidade</a>.</p>
           </div>
           <div id="coStep2Pix" style="display:none">
-            <div class="co-right-title">Escaneie o QR Code</div>
-            <div class="co-right-sub">Abra o app do seu banco e escaneie</div>
+            <div class="co-right-title">Escaneie o QR Code PIX</div>
+            <div class="co-right-sub">Abra o aplicativo do seu banco e escaneie ou copie a chave</div>
             <div id="coPixContent" class="co-pix-area">
-              <div class="pix-loading">Gerando PIX…</div>
+              <div class="pix-loading">Gerando QR Code PIX…</div>
             </div>
           </div>
         </div>
-
-        <!-- Painel Cartão -->
-        <div class="co-tab-panel" id="panelCard" style="display:none">
-          <div id="coCardContent">
-            <div class="co-right-title">Pagar com Cartão</div>
-
-            <!-- Cartões salvos (carregado via JS) -->
-            <div id="savedCardsSection" style="display:none">
-              <div class="co-saved-label">Seus cartões</div>
-              <div id="savedCardsList"></div>
-              <button class="co-add-card-btn" id="showNewCardBtn">+ Usar outro cartão</button>
-              <div class="co-divider" style="margin:14px 0"></div>
-            </div>
-
-            <!-- Formulário novo cartão -->
-            <div id="newCardForm">
-              <div class="co-field-group">
-                <label class="co-label">Número do cartão</label>
-                <div class="co-card-input-wrap">
-                  <input type="text" class="co-input" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric">
-                  <span class="co-card-brand-icon" id="cardBrandIcon">💳</span>
-                </div>
-              </div>
-              <div class="co-field-group">
-                <label class="co-label">Nome no cartão</label>
-                <input type="text" class="co-input" id="cardOwner" placeholder="NOME SOBRENOME" autocomplete="cc-name" style="text-transform:uppercase">
-              </div>
-              <div class="co-field-row">
-                <div class="co-field-group">
-                  <label class="co-label">Validade</label>
-                  <input type="text" class="co-input" id="cardExpiry" placeholder="MM/AA" maxlength="5" inputmode="numeric">
-                </div>
-                <div class="co-field-group">
-                  <label class="co-label">CVV</label>
-                  <input type="text" class="co-input" id="cardCvv" placeholder="123" maxlength="4" inputmode="numeric">
-                </div>
-              </div>
-              <label class="co-save-card-label" id="saveCardToggle">
-                <input type="checkbox" id="saveCardCheck" style="accent-color:var(--gold)">
-                <span>Salvar cartão para próximas compras</span>
-              </label>
-            </div>
-
-            <div class="co-summary" style="margin-top:14px">
-              <div class="co-summary-row co-total">
-                <span>Total hoje</span>
-                <span style="color:${info.color}">${info.preco}</span>
-              </div>
-            </div>
-
-            <button class="co-pay-btn" id="coPayCardBtn" style="background:linear-gradient(135deg,${info.color},${info.color}cc)">
-              Pagar ${info.preco} →
-            </button>
-            <div id="coCardMsg" style="font-size:13px;margin-top:8px;text-align:center"></div>
-            <div class="co-badges"><span>🔒 Dados criptografados</span><span>✅ Aprovação imediata</span></div>
-            <p class="co-terms-note">Ao prosseguir você concorda com os <a href="termos.html" target="_blank">Termos de Uso</a>.</p>
-          </div>
-
-          <!-- Resultado do cartão -->
-          <div id="coCardResult" style="display:none"></div>
-        </div>
-
       </div>
     </div>
   `
