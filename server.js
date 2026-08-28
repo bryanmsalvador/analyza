@@ -478,7 +478,7 @@ app.post("/api/analyze", auth, async (req, res) => {
     if (!extractData) return res.status(400).json({ error: "Nenhum dado enviado" })
 
     const isBusiness = userData.plan === "business"
-    const modelName  = isBusiness ? "gemini-1.5-pro" : "gemini-1.5-flash"
+    const modelName  = "gemini-1.5-flash"
     const model  = genAI.getGenerativeModel({ model: modelName })
     const prompt = isBusiness ? buildPromptBusiness(extractData) : buildPromptFree(extractData)
     const result = await model.generateContent(prompt)
