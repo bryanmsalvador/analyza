@@ -607,5 +607,43 @@ document.querySelectorAll(".mobile-nav-link").forEach(a => {
 })()
 </script>
 
+<!-- ASSISTENTE CHATBOT WIDGET -->
+<div class="analyza-chat-trigger" id="chatTrigger" aria-label="Assistente Analyza">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+  <div class="analyza-chat-badge hidden" id="chatBadge">0</div>
+</div>
+
+<div class="analyza-chat-window" id="chatWindow">
+  <div class="chat-header">
+    <div class="chat-header-user">
+      <div class="chat-avatar">✨</div>
+      <div>
+        <div class="chat-title">Aura — Analyza</div>
+        <div class="chat-status"><span class="chat-status-dot"></span> Assistente IA Online</div>
+      </div>
+    </div>
+    <button class="chat-close-btn" id="chatClose">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="chat-bubble bot">
+      Olá! Sou a Aura, assistente virtual do Analyza. ✨<br>Como posso te ajudar hoje?
+    </div>
+    <div class="chat-chips">
+      <button class="chat-chip-btn" data-ask="Como funciona o Analyza?">💡 Como funciona?</button>
+      <button class="chat-chip-btn" data-ask="Quais são os planos e vantagens?">⚡ Quais os planos?</button>
+      <button class="chat-chip-btn" data-ask="Meus dados bancários ficam salvos?">🔒 É seguro?</button>
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <input type="text" class="chat-input" id="chatInput" placeholder="Pergunte algo sobre o Analyza…">
+    <button class="chat-send-btn" id="chatSendBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script src="chat-widget.js?v=1"></script>
 </body>
 </html>

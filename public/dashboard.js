@@ -262,11 +262,13 @@ analyzeBtn.onclick = async () => {
             <span style="color:#C9A84C">⚠️ Verifique seu email para liberar as análises.</span>
             <button onclick="resendVerifyEmail(this)" style="background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:#C9A84C;padding:3px 10px;border-radius:6px;cursor:pointer;font-size:12px;margin-left:8px;font-family:var(--font-body)">Reenviar email</button>
           `
+          window.notifyChatAssistant?.("⚠️ Notificação: Lembre-se de verificar seu e-mail para liberar as análises com IA!")
         } else {
           analyzeMsg.innerHTML = `
             <span style="color:#f87171">${esc(json.error || json.message || "Acesso negado")}</span>
             <a href="index.html#pricing" style="color:var(--gold);margin-left:8px">Ver planos →</a>
           `
+          window.notifyChatAssistant?.(`⚡ Ops! ${json.error || json.message || "Limite atingido"}. Que tal dar uma olhada nos planos Pro e Business?`)
         }
         return
       }

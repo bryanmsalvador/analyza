@@ -504,6 +504,60 @@ app.post("/api/analyze", auth, async (req, res) => {
   }
 })
 
+// ── CHAT SUPPORT (Assistente Analyza) ──────────────────────────────────────
+app.post("/api/chat-support", async (req, res) => {
+  try {
+    const { message, history } = req.body
+    if (!message) return res.status(400).json({ error: "Mensagem vazia" })
+
+    const model = genAI.getGenerativeModel({ model: "gemini-3.6-flash" })
+
+    const systemPrompt = `Você é a "Aura", a assistente virtual inteligente e amigável da plataforma Analyza.
+Seu objetivo é ajudar usuários com dúvidas sobre o Analyza, planos, segurança e como usar a plataforma.
+
+INFORMAÇÕES SOBRE O ANALYZA:
+- O Analyza é uma plataforma SaaS que lê extratos bancários (CSV, PDF, TXT ou texto colado) e usa IA para categorizar gastos, calcular Score de Saúde Financeira (0-100), identificar assinaturas/streamings e recomendar cortes de custo.
+- SEGURANÇA: Dados de extratos são processados na hora e descartados imediatamente. Nunca salvamos senhas bancárias ou dados privados.
+- PLANOS:
+  1. Free: R$ 0/mês — 10 análises/mês, categorização automática e score.
+  2. Pro: R$ 8,90/mês — Análises ilimitadas, histórico completo e alertas.
+  3. Business: R$ 15,90/mês — Diagnóstico consultivo completo, detecção de streamings/assinaturas (essencial vs dispensável), médias mensais, gráficos de tendência e recomendações de corte de custo com valores exatos.
+- PAGAMENTOS: PIX automático e Cartão de Crédito recorrente, cancele quando quiser.
+
+REGRAS:
+- Responda em português brasileiro de forma simpática, curta e objetiva (máximo 3 a 4 frases).
+- NUNCA mencione códigos internos, chaves de API, estrutura do banco de dados ou detalhes técnicos confidenciais.
+- Se o usuário perguntar algo totalmente não relacionado ao Analyza ou finanças pessoais, responda com gentileza explicando que seu foco é ajudar com a plataforma Analyza.`
+
+    const contents = [
+      { role: "user", parts: [{ text: systemPrompt }] },
+      { role: "model", parts: [{ text: "Compreendido! Sou a Aura, assistente da Analyza. Como posso te ajudar hoje?" }] }
+    ]
+
+    if (Array.isArray(history)) {
+      history.slice(-6).forEach(h => {
+        if (h.sender === "user" || h.sender === "bot") {
+          contents.push({
+            role: h.sender === "user" ? "user" : "model",
+            parts: [{ text: h.text }]
+          })
+        }
+      })
+    }
+
+    contents.push({ role: "user", parts: [{ text: message }] })
+
+    const result = await model.generateContent({ contents })
+    const reply  = result.response.text()
+
+    res.json({ reply })
+  } catch (err) {
+    console.error("chat-support:", err.message)
+    res.json({ reply: "Ops! Tive um probleminha temporário de conexão. Pode repetir sua pergunta?" })
+  }
+})
+
+
 
 // ── USUÁRIO ───────────────────────────────────────────────────────────────────
 
